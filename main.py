@@ -72,10 +72,10 @@ def index():
         get_db().commit()
     else:
         aCurTab = query_db('SELECT * FROM tabs WHERE id=? LIMIT 1', (sSelected,))
-        if len(aCurTab)>0 and len(aCurTab[0])>1:
-            sSelFile = aCurTab[0][4]
-            if sSelFile:
-                sPreviewURL = "preview?sSelected="+sSelected+"&sFile="+sSelFile
+        if len(aCurTab)>0 and len(aCurTab[0])>3:
+            sFile = aCurTab[0][3]
+            if sFile:
+                sPreviewURL = "preview?sSelected="+sSelected+"&sFile="+sFile
 
     aFiles = []
     aDirs = []
