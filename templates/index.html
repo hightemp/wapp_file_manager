@@ -1,0 +1,90 @@
+{% include "b_header.html" %}
+
+    <div class="tabs-list">
+        <div class="left-panel">
+            <div class="btn-group" style="width:100%">
+                <a href="/readme?sSelected={{ sSelected }}" class="btn btn-secondary" aria-current="page">README</a>
+                <a href="/tabs_add?sSelected={{ sSelected }}" class="btn btn-success" aria-current="page">Добавить</a>
+                <a href="/tabs_remove?sSelected={{ sSelected }}" class="btn btn-danger">Удалить</a>
+                <a href="/tabs_clean?sSelected={{ sSelected }}" class="btn btn-danger">Очистить</a>
+            </div>
+            <div class="list-group left-panel-list">
+                {% for oTab in aTabs %}
+                    <div class="input-group tab-row">
+                        <div class="input-group-text">
+                            <input class="form-check-input mt-0" type="checkbox" value="" name="tabs[{{oTab[0]}}]">
+                        </div>
+                        <a 
+                            class="list-group-item list-group-item-action {{ 'active' if oTab[0]|string == sSelected }} " 
+                            href="?sSelected={{ oTab[0] }}"
+                        >
+                            {{ oTab[1] }}
+                            <br>
+                            <small>{{ oTab[2] }}</small>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right-panel">
+            {% if sSelected %}
+            <div class="right-panel-block">
+                <div class="header"><b>Директории:</b> {{sPath}}</div>
+                <div class="btn-group">
+                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page">^ Наверх</a>
+                    <a href="#" class="btn btn-primary" aria-current="page">Обновить</a>
+                    <a href="#" class="btn btn-success" aria-current="page">Создать</a>
+                    <a href="#" class="btn btn-danger">Удалить</a>
+                    <a href="#" class="btn btn-danger">Очистить</a>
+                </div>
+                <div class="list-group right-panel-list">
+                    {% if aDirs|length == 0 %}
+                    <div class="nothing-found-row">Ничего не найдено..</div>
+                    {% endif %}
+                    {% for sDir in aDirs %}
+                        <div class="input-group dir-row">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="{{sDir}}" name="files[]">
+                            </div>
+                            
+                            <a 
+                                class="list-group-item list-group-item-action" 
+                                href="?sSelected={{sSelected}}&sDir={{sDir}}"
+                            >
+                                {% include 'folder-item.html' %}
+                                {{ sDir }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="right-panel-block">
+                <div class="header"><b>Файлы</b></div>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-primary" aria-current="page">Обновить</a>
+                    <a href="#" class="btn btn-success" aria-current="page">Создать</a>
+                    <a href="#" class="btn btn-danger">Удалить</a>
+                    <a href="#" class="btn btn-danger">Очистить</a>
+                </div>
+                <div class="list-group right-panel-list">
+                    {% if aFiles|length == 0 %}
+                    <div class="nothing-found-row">Ничего не найдено..</div>
+                    {% endif %}
+                    {% for sFile in aFiles %}
+                        <div class="input-group file-row">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]">
+                            </div>
+                            <a target="preview" class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" href="preview/?sSelected={{sSelected}}&sFile={{sFile}}">{{ sFile }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="preview-panel">
+            <iframe name="preview" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+{% include "b_footer.html" %}
