@@ -20,7 +20,7 @@ body, html {
     right: 0px;
     bottom: 0px;
     display: grid;
-    grid-template-columns: 300px 1fr 400px;
+    grid-template-columns: 300px 1fr 1fr;
 }
 
 .left-panel {

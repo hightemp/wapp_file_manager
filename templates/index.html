@@ -31,7 +31,9 @@
             <div class="right-panel-block">
                 <div class="header"><b>Директории:</b> {{sPath}}</div>
                 <div class="btn-group">
-                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page">^ Наверх</a>
+                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-left"></i></a>
+                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-right"></i></a>
+                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-up"></i></a>
                     <a href="#" class="btn btn-primary" aria-current="page">Обновить</a>
                     <a href="#" class="btn btn-success" aria-current="page">Создать</a>
                     <a href="#" class="btn btn-danger">Удалить</a>
@@ -65,6 +67,8 @@
                     <a href="#" class="btn btn-success" aria-current="page">Создать</a>
                     <a href="#" class="btn btn-danger">Удалить</a>
                     <a href="#" class="btn btn-danger">Очистить</a>
+                    <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks-grid"></i></a>
+                    <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks"></i></a>
                 </div>
                 <div class="list-group right-panel-list">
                     {% if aFiles|length == 0 %}
@@ -75,7 +79,7 @@
                             <div class="input-group-text">
                                 <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]">
                             </div>
-                            <a target="preview" class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" href="preview/?sSelected={{sSelected}}&sFile={{sFile}}">{{ sFile }}</a>
+                            <a target="preview" class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" href="preview?sSelected={{sSelected}}&sFile={{sFile}}">{{ sFile }}</a>
                         </div>
                     {% endfor %}
                 </div>

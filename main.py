@@ -15,6 +15,7 @@ import filetype
 import sqlite3
 import glob
 import re
+import base64
 
 app = Flask(__name__)
 
@@ -48,7 +49,10 @@ def query_db(query, args=(), one=False):
 @app.route("/")
 def index():
     if (request.args.get('init_db', '')=='1'):
+        print("=========================================================")
+        print("INIT DB")
         init_db()
+        print("=========================================================")
         return redirect("/")
 
     from os import listdir
@@ -98,8 +102,11 @@ def index():
         sCurFile=sFile
     )
 
+textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
+is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
+
 @app.route("/preview")
-def tabs_add():
+def preview():
     sSelected = request.args.get('sSelected', '')
     sFile = request.args.get('sFile', '')
 
@@ -107,20 +114,30 @@ def tabs_add():
     if len(aCurTab)>0 and len(aCurTab[0])>1:
         sFullPath = aCurTab[0][2]
 
-    sFullPath = os.oath.join(sFullPath, sFile)
+    sFullPath = os.path.join(sFullPath, sFile)
 
-    oRegImgExt = re.compile("(APNG|AVIF|GIF|JPEG|PNG|SVG|BMP|ICO|TIFF)$", re.I)
+    oRegImgExt = re.compile(r"(APNG|AVIF|GIF|JPG|JPEG|PNG|SVG|BMP|ICO|TIFF)$", re.IGNORECASE)
     
-    if (oRegImgExt.match(sFile)):
+    if (oRegImgExt.search(sFile)):
+        print(sFullPath)
         return render_template('preview_image.html', 
+            sFullPath=sFullPath,
+            sFullSizeBase64Code=base64.b64encode(open(sFullPath,'rb').read()).decode('utf-8')
+        )
+
+    oRegPDFExt = re.compile(r"(PDF)$", re.IGNORECASE)
+    
+    if (oRegPDFExt.search(sFile)):
+        return render_template('preview_pdf.html', 
             sFullPath=sFullPath
         )
 
-    oRegImgExt = re.compile("(APNG|AVIF|GIF|JPEG|PNG|SVG|BMP|ICO|TIFF)$", re.I)
-    
-    if (oRegImgExt.match(sFile)):
-        return render_template('preview_image.html', 
-            sFullPath=sFullPath
+    if is_binary_string(open(sFullPath, 'rb').read(1024)):
+        return ""
+    else:
+        sCode = open(sFullPath).read()
+        return render_template('preview_textfile.html', 
+            sCode=sCode
         )
 
 @app.route("/readme")
