@@ -63,6 +63,20 @@ def index():
     sDir = request.args.get('sDir', '')
     sFile = request.args.get('sFile', '')
 
+    sPreviewURL="about:blank"
+
+    if sFile != '':
+        sPreviewURL = "preview?sSelected="+sSelected+"&sFile="+sFile
+        print('[!] FILE SAVED:'+sFile)
+        get_db().execute("UPDATE tabs SET selected_file=? WHERE id=?", (sFile, sSelected))
+        get_db().commit()
+    else:
+        aCurTab = query_db('SELECT * FROM tabs WHERE id=? LIMIT 1', (sSelected,))
+        if len(aCurTab)>0 and len(aCurTab[0])>1:
+            sSelFile = aCurTab[0][4]
+            if sSelFile:
+                sPreviewURL = "preview?sSelected="+sSelected+"&sFile="+sSelFile
+
     aFiles = []
     aDirs = []
 
@@ -99,7 +113,8 @@ def index():
         aDirs=aDirs, 
         aFiles=aFiles,
         sCurDir=sDir,
-        sCurFile=sFile
+        sCurFile=sFile,
+        sPreviewURL=sPreviewURL
     )
 
 textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})

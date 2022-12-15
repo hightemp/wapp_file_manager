@@ -79,7 +79,10 @@
                             <div class="input-group-text">
                                 <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]">
                             </div>
-                            <a target="preview" class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" href="preview?sSelected={{sSelected}}&sFile={{sFile}}">{{ sFile }}</a>
+                            <a 
+                                class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
+                                href="?sSelected={{sSelected}}&sFile={{sFile}}"
+                            >{{ sFile }}</a>
                         </div>
                     {% endfor %}
                 </div>
@@ -87,7 +90,7 @@
             {% endif %}
         </div>
         <div class="preview-panel">
-            <iframe name="preview" src="" frameborder="0"></iframe>
+            <iframe name="preview" src="{{sPreviewURL}}" frameborder="0"></iframe>
         </div>
     </div>
 
