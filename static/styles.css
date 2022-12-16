@@ -112,3 +112,7 @@ body, html {
     background: #eee;
     padding: 10px
 }
+
+.container {
+    width: 400px;
+}

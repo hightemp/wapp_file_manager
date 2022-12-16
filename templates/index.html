@@ -12,7 +12,7 @@
                 {% for oTab in aTabs %}
                     <div class="input-group tab-row">
                         <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox" value="" name="tabs[{{oTab[0]}}]">
+                            <input class="form-check-input mt-0" type="checkbox" value="" name="tabs[{{oTab[0]}}]" />
                         </div>
                         <a 
                             class="list-group-item list-group-item-action {{ 'active' if oTab[0]|string == sSelected }} " 
@@ -29,63 +29,71 @@
         <div class="right-panel">
             {% if sSelected %}
             <div class="right-panel-block">
-                <div class="header"><b>Директории:</b> {{sPath}}</div>
-                <div class="btn-group">
-                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-left"></i></a>
-                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-right"></i></a>
-                    <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-up"></i></a>
-                    <a href="#" class="btn btn-primary" aria-current="page">Обновить</a>
-                    <a href="#" class="btn btn-success" aria-current="page">Создать</a>
-                    <a href="#" class="btn btn-danger">Удалить</a>
-                    <a href="#" class="btn btn-danger">Очистить</a>
-                </div>
-                <div class="list-group right-panel-list">
-                    {% if aDirs|length == 0 %}
-                    <div class="nothing-found-row">Ничего не найдено..</div>
-                    {% endif %}
-                    {% for sDir in aDirs %}
-                        <div class="input-group dir-row">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value="{{sDir}}" name="files[]">
+                <form action="" method="get">
+                    <div class="header"><b>Директории:</b> {{sPath}}</div>
+                    <div class="btn-group">
+                        <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-left"></i></a>
+                        <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-right"></i></a>
+                        <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-up"></i></a>
+                        <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page">Обновить</a>
+                        <button class="btn btn-success" type="submit" name="action" value="create_dir">Создать</button>
+                        <button class="btn btn-secondary" type="submit" name="action" value="copy_dir">Копировать</button>
+                        <button class="btn btn-danger" type="submit" name="action" value="remove_dir">Удалить</button>
+                        <button class="btn btn-danger" type="submit" name="action" value="clean_dirs">Очистить</button>
+                    </div>
+                    <div class="list-group right-panel-list">
+                        {% if aDirs|length == 0 %}
+                        <div class="nothing-found-row">Ничего не найдено..</div>
+                        {% endif %}
+                        {% for sDir in aDirs %}
+                            <div class="input-group dir-row">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" value="{{sDir}}" name="files[]" />
+                                </div>
+                                
+                                <a 
+                                    class="list-group-item list-group-item-action" 
+                                    href="?sSelected={{sSelected}}&sDir={{sDir}}"
+                                >
+                                    {% include 'folder-item.html' %}
+                                    {{ sDir }}
+                                </a>
                             </div>
-                            
-                            <a 
-                                class="list-group-item list-group-item-action" 
-                                href="?sSelected={{sSelected}}&sDir={{sDir}}"
-                            >
-                                {% include 'folder-item.html' %}
-                                {{ sDir }}
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
+                </form>
             </div>
             <div class="right-panel-block">
-                <div class="header"><b>Файлы</b></div>
-                <div class="btn-group">
-                    <a href="#" class="btn btn-primary" aria-current="page">Обновить</a>
-                    <a href="#" class="btn btn-success" aria-current="page">Создать</a>
-                    <a href="#" class="btn btn-danger">Удалить</a>
-                    <a href="#" class="btn btn-danger">Очистить</a>
-                    <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks-grid"></i></a>
-                    <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks"></i></a>
-                </div>
-                <div class="list-group right-panel-list">
-                    {% if aFiles|length == 0 %}
-                    <div class="nothing-found-row">Ничего не найдено..</div>
-                    {% endif %}
-                    {% for sFile in aFiles %}
-                        <div class="input-group file-row">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]">
+                <form action="" method="get">
+                    <div class="header"><b>Файлы</b></div>
+                    <div class="btn-group">
+                        <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page">Обновить</a>
+                        <button class="btn btn-success" type="submit" name="action" value="create_file">Создать</button>
+                        <button class="btn btn-secondary" type="submit" name="action" value="copy_file">Копировать</button>
+                        <button class="btn btn-danger" type="submit" name="action" value="remove_file">Удалить</button>
+                        <button class="btn btn-danger" type="submit" name="action" value="clean_files">Очистить</button>
+                        <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks-grid"></i></a>
+                        <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks"></i></a>
+                    </div>
+                    <div class="list-group right-panel-list">
+                        {% if aFiles|length == 0 %}
+                        <div class="nothing-found-row">Ничего не найдено..</div>
+                        {% endif %}
+                        {% for sFile in aFiles %}
+                            <div class="input-group file-row">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]" />
+                                </div>
+                                <a 
+                                    class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
+                                    href="?sSelected={{sSelected}}&sFile={{sFile}}"
+                                >{{ sFile }}</a>
                             </div>
-                            <a 
-                                class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
-                                href="?sSelected={{sSelected}}&sFile={{sFile}}"
-                            >{{ sFile }}</a>
-                        </div>
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
+                </form>
             </div>
             {% endif %}
         </div>

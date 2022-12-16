@@ -46,7 +46,7 @@ def query_db(query, args=(), one=False):
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
     if (request.args.get('init_db', '')=='1'):
         print("=========================================================")
@@ -54,6 +54,8 @@ def index():
         init_db()
         print("=========================================================")
         return redirect("/")
+
+    sBaseURL = request.url
 
     from os import listdir
     from os.path import isdir, isfile, join
@@ -63,6 +65,52 @@ def index():
     sDir = request.args.get('sDir', '')
     sFile = request.args.get('sFile', '')
 
+    print("[>]", request.args)
+    if ("action" in request.args):
+        if request.args["action"]=="create_dir":
+            return render_template('dir_create.html', 
+                sSelected=sSelected
+            )
+        if request.args["action"]=="remove_dir":
+            return render_template('dir_remove.html', 
+                sSelected=sSelected
+            )
+        if request.args["action"]=="clean_dirs":
+            return render_template('dir_clean.html', 
+                sSelected=sSelected
+            )
+        if request.args["action"]=="copy_dir":
+            return ""
+        if request.args["action"]=="accept_save_dir":
+            os.mkdir(request.args["name"])
+        if request.args["action"]=="accept_remove_dir":
+            os.rmdir(request.args["name"])
+        if request.args["action"]=="accept_clean_dirs":
+            pass
+
+        if request.args["action"]=="create_file":
+            return render_template('file_create.html', 
+                sSelected=sSelected
+            )
+        if request.args["action"]=="remove_file":
+            return render_template('file_remove.html', 
+                sSelected=sSelected
+            )
+        if request.args["action"]=="clean_files":
+            return render_template('file_clean.html', 
+                sSelected=sSelected
+            )
+        if request.args["action"]=="copy_file":
+            return ""
+        if request.args["action"]=="accept_save_file":
+            os.mkdir(request.args["name"])
+        if request.args["action"]=="accept_remove_file":
+            os.rmdir(request.args["name"])
+        if request.args["action"]=="accept_clean_files":
+            pass
+
+        return redirect(request.path+"?sSelected="+sSelected)
+    
     sPreviewURL="about:blank"
 
     if sFile != '':
@@ -114,7 +162,8 @@ def index():
         aFiles=aFiles,
         sCurDir=sDir,
         sCurFile=sFile,
-        sPreviewURL=sPreviewURL
+        sPreviewURL=sPreviewURL,
+        sBaseURL=sBaseURL
     )
 
 textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
