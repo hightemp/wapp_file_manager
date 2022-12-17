@@ -121,3 +121,25 @@ body, html {
     background: #eee;
     padding: 10px
 }
+
+.rsync-wrapper {
+    position:absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    display: grid;
+    grid-template-columns: 300px 1fr 1fr;
+}
+
+.rsync-tabs-panel {
+    border-right: 1px solid #eee;
+}
+
+.rsync-desc-panel {
+    border-right: 1px solid #eee;
+}
+
+.rsync-output-panel {
+    
+}

@@ -1,0 +1,19 @@
+{% include "b_header.html" %}
+
+<div class="rsync-wrapper">
+    <div class="rsync-tabs-panel">
+        <div class="btn-group" style="width:100%">
+            <a href="/" class="btn btn-light" title="Назад" ><i class="bi bi-arrow-90deg-left"></i></a>
+            <a href="/rsync?action=rsync_add" class="btn btn-success" title="Создать" ><i class="bi bi-file-plus"></i></a>
+            <a href="/rsync?action=rsync_edit" class="btn btn-secondary" title="Редактировать" ><i class="bi bi-pencil"></i></a>
+            <a href="/rsync?action=rsync_remove" class="btn btn-danger" title="Удалить"><i class="bi bi-trash"></i></a>
+            <a href="/rsync?action=" class="btn btn-danger" title="Очистить"><i class="bi bi-trash-fill"></i></a>
+        </div>
+    </div>
+    <div class="rsync-desc-panel">
+    </div>
+    <div class="rsync-output-panel">
+    </div>
+</div>
+
+{% include "b_footer.html" %}

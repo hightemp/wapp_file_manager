@@ -332,3 +332,53 @@ def tabs_clean():
         )
 
     return redirect("/?sSelected="+sSelected)
+
+import sysrsync
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+def sensor():
+    """ Function for test purposes. """
+    print("Scheduler is alive!")
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(sensor,'interval',minutes=1)
+sched.start()
+
+@app.route("/rsync")
+def rsync():
+    
+    if ("action" in request.args):
+        if request.args["action"]=="rsync_add":
+            pass
+
+        if request.args["action"]=="rsync_edit":
+            pass
+
+        if request.args["action"]=="rsync_remove":
+            pass
+
+        if request.args["action"]=="rsync_option_add":
+            pass
+
+        if request.args["action"]=="rsync_option_edit":
+            pass
+
+        if request.args["action"]=="rsync_option_remove":
+            pass
+
+        if request.args["action"]=="rsync_process_add":
+            pass
+
+        if request.args["action"]=="rsync_process_edit":
+            pass
+
+        if request.args["action"]=="rsync_process_remove":
+            pass
+            # get_db().execute("DELETE tabs WHERE id=?", (sSelected,))
+            # get_db().commit()
+
+    return render_template('rsync_list.html')
+
+if __name__ == "__main__":
+    app.run()

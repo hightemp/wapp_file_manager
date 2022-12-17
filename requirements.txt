@@ -1,2 +1,4 @@
 Flask==2.0.1
 Jinja2==3.0.1
+sysrsync==1.1.0
+gunicorn==20.1.0
