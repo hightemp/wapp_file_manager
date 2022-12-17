@@ -42,5 +42,5 @@ CREATE TABLE rsync_sync_processes (
     stopped_at INTEGER NULL,
     progress INTEGER NOT NULL,
     stdout TEXT NULL,
-    stderror TEXT NULL,
+    stderror TEXT NULL
 );
