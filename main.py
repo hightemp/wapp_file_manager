@@ -16,6 +16,8 @@ import sqlite3
 import glob
 import re
 import base64
+import urllib.parse
+from flask import Response
 
 app = Flask(__name__)
 
@@ -45,6 +47,13 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
+def sizeof_fmt(num, suffix="B"):
+    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -127,6 +136,7 @@ def index():
 
     aFiles = []
     aDirs = []
+    aFilesInfo = []
 
     if sPath != '':
         print('[!] SAVED:'+sPath)
@@ -152,7 +162,12 @@ def index():
     try:
         aFiles = sorted([f for f in listdir(sPath) if isfile(join(sPath, f))])
         aDirs = sorted([f for f in listdir(sPath) if isdir(join(sPath, f))])
-    except:
+        aFilesInfoTemp = [os.stat(os.path.join(sPath, f)) for f in aFiles]
+        aFilesInfo = []
+        for iI, oI in enumerate(aFilesInfoTemp):
+            aFilesInfo.append({'human_size': sizeof_fmt(oI.st_size)})
+    except RuntimeError as e:
+        print("[E] ERROR:"+e)
         pass
 
     return render_template('index.html', 
@@ -160,6 +175,7 @@ def index():
         sPath=sPath,
         aDirs=aDirs, 
         aFiles=aFiles,
+        aFilesInfo=aFilesInfo,
         sCurDir=sDir,
         sCurFile=sFile,
         sPreviewURL=sPreviewURL,
@@ -168,6 +184,30 @@ def index():
 
 textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
 is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
+
+@app.route("/getfile")
+def getfile():
+    sFullPath = request.args.get('sFullPath', '')
+    print("[!] >> "+sFullPath)
+
+    if re.search(r"djvu$", sFullPath):
+        sFileName = os.path.basename(sFullPath)+'.pdf'
+        sTmpFile = '/tmp/'+sFileName
+        print("[!] >> "+sTmpFile)
+        if not os.path.isfile(sTmpFile):
+            sCMD = 'ddjvu -format=pdf -quality=85 -verbose "'+sFullPath+'" "'+sTmpFile+'" '
+            os.system(sCMD)
+        sFullPath = sTmpFile
+
+    if not os.path.isfile(sFullPath):
+        return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>"
+
+    resp = Response(open(sFullPath, 'rb').read())
+
+    if re.search(r"pdf$", sFullPath):    
+        resp.headers['Content-Type'] = 'application/pdf'
+    
+    return resp
 
 @app.route("/preview")
 def preview():
@@ -189,15 +229,18 @@ def preview():
             sFullSizeBase64Code=base64.b64encode(open(sFullPath,'rb').read()).decode('utf-8')
         )
 
-    oRegPDFExt = re.compile(r"(PDF)$", re.IGNORECASE)
+    oRegPDFExt = re.compile(r"(PDF|DJVU)$", re.IGNORECASE)
     
     if (oRegPDFExt.search(sFile)):
         return render_template('preview_pdf.html', 
-            sFullPath=sFullPath
+            sFullPath="/getfile?sFullPath="+urllib.parse.quote(sFullPath)
         )
 
+    if not os.path.isfile(sFullPath):
+        return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>" 
+    
     if is_binary_string(open(sFullPath, 'rb').read(1024)):
-        return ""
+        return "<h1>Бинарный файл</h1><p>"+sFullPath+"</p>" 
     else:
         sCode = open(sFullPath).read()
         return render_template('preview_textfile.html', 

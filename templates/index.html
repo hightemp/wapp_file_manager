@@ -41,7 +41,7 @@
                         <button class="btn btn-danger" type="submit" name="action" value="remove_dir">Удалить</button>
                         <button class="btn btn-danger" type="submit" name="action" value="clean_dirs">Очистить</button>
                     </div>
-                    <div class="list-group right-panel-list">
+                    <div class="list-group right-panel-list dirs-list">
                         {% if aDirs|length == 0 %}
                         <div class="nothing-found-row">Ничего не найдено..</div>
                         {% endif %}
@@ -76,7 +76,7 @@
                         <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks-grid"></i></a>
                         <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks"></i></a>
                     </div>
-                    <div class="list-group right-panel-list">
+                    <div class="list-group right-panel-list files-list">
                         {% if aFiles|length == 0 %}
                         <div class="nothing-found-row">Ничего не найдено..</div>
                         {% endif %}
@@ -88,7 +88,10 @@
                                 <a 
                                     class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
                                     href="?sSelected={{sSelected}}&sFile={{sFile}}"
-                                >{{ sFile }}</a>
+                                >
+                                    <div>{{ sFile }}</div>
+                                    <small>{{ aFilesInfo[loop.index-1].human_size }}</small>
+                                </a>
                             </div>
                         {% endfor %}
                     </div>
@@ -102,4 +105,10 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(() => {
+            $(".dirs-list").scrollTo($(".dirs-list .list-group-item.active"), {offset: {top:-100}})
+            $(".files-list").scrollTo($(".files-list .list-group-item.active"), {offset: {top:-100}})
+        })
+    </script>
 {% include "b_footer.html" %}
