@@ -3,10 +3,10 @@
     <div class="tabs-list">
         <div class="left-panel">
             <div class="btn-group" style="width:100%">
-                <a href="/readme?sSelected={{ sSelected }}" class="btn btn-secondary" aria-current="page">README</a>
-                <a href="/tabs_add?sSelected={{ sSelected }}" class="btn btn-success" aria-current="page">Добавить</a>
-                <a href="/tabs_remove?sSelected={{ sSelected }}" class="btn btn-danger">Удалить</a>
-                <a href="/tabs_clean?sSelected={{ sSelected }}" class="btn btn-danger">Очистить</a>
+                <a href="/readme?sSelected={{ sSelected }}" class="btn btn-secondary" title="README" ><i class="bi bi-layout-text-window-reverse"></i></a>
+                <a href="/tabs_add?sSelected={{ sSelected }}" class="btn btn-success" title="Создать" ><i class="bi bi-file-plus"></i></a>
+                <a href="/tabs_remove?sSelected={{ sSelected }}" class="btn btn-danger" title="Удалить"><i class="bi bi-trash"></i></a>
+                <a href="/tabs_clean?sSelected={{ sSelected }}" class="btn btn-danger" title="Очистить"><i class="bi bi-trash-fill"></i></a>
             </div>
             <div class="list-group left-panel-list">
                 {% for oTab in aTabs %}
