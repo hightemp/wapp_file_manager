@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS rsync_sync;
 CREATE TABLE rsync_sync (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NULL
-)
+);
 
 DROP TABLE IF EXISTS rsync_options;
 CREATE TABLE rsync_options (
@@ -43,4 +43,4 @@ CREATE TABLE rsync_sync_processes (
     progress INTEGER NOT NULL,
     stdout TEXT NULL,
     stderror TEXT NULL,
-)
+);
