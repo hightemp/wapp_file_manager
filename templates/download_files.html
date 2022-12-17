@@ -1,0 +1,32 @@
+{% include "b_header.html" %}
+
+<div class="container message-box">
+<script src="static/downloader.js"></script>
+
+<script>
+var sPath = {{ sPath|tojson }}
+var aFiles = {{ aFiles|tojson }}
+
+for (var sFile of aFiles) {
+    fnDownloadLink('/getfile?bDownload=1&sFullPath='+encodeURIComponent(sPath+'/'+sFile), sFile)
+}
+
+</script>
+
+    <h1>Скачивание</h1>
+
+    {% for sFile in aFiles %}
+    <p>{{sPath+"/"+sFile}}</p>
+    {% endfor %}
+
+    <form action="">
+        <input type="hidden" name="sSelected" value="{{sSelected}}">
+        <input type="hidden" name="sPath" value="{{sPath}}">
+        <input type="hidden" name="sDir" value="{{sDir}}">
+        <input type="hidden" name="sFile" value="{{sFile}}">
+
+        <button class="btn btn-success" type="submit" name="action" value="back">Назад</button>
+    </form>
+</div>
+
+{% include "b_footer.html" %}

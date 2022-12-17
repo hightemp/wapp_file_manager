@@ -93,7 +93,9 @@ def index():
         if request.args["action"]=="accept_save_dir":
             os.mkdir(request.args["name"])
         if request.args["action"]=="accept_remove_dir":
-            os.rmdir(request.args["name"])
+            aDirs = request.args.getlist("dirs[]")
+            for sDir in aDirs:
+                os.rmdir(os.path.join(sPath, sDir))
         if request.args["action"]=="accept_clean_dirs":
             pass
 
@@ -102,21 +104,42 @@ def index():
                 sSelected=sSelected
             )
         if request.args["action"]=="remove_file":
+            aFiles = request.args.getlist("files[]")
             return render_template('file_remove.html', 
-                sSelected=sSelected
+                aFiles=aFiles,
+                sSelected=sSelected,
+                sPath=sPath,
+                sDir=sDir,
+                sFile=sFile                
             )
         if request.args["action"]=="clean_files":
             return render_template('file_clean.html', 
                 sSelected=sSelected
             )
         if request.args["action"]=="copy_file":
+            aFiles = request.args.getlist("files[]")
             return ""
         if request.args["action"]=="accept_save_file":
-            os.mkdir(request.args["name"])
+            pass
         if request.args["action"]=="accept_remove_file":
-            os.rmdir(request.args["name"])
+            aFiles = request.args.getlist("files[]")
+            for sFile in aFiles:
+                print(os.path.join(sPath, sFile))
+                os.unlink(os.path.join(sPath, sFile))
         if request.args["action"]=="accept_clean_files":
             pass
+
+        if request.args["action"]=="upload_files":
+            return render_template('upload_files.html')
+        if request.args["action"]=="download_files":
+            aFiles = request.args.getlist("files[]")
+            return render_template('download_files.html',
+                aFiles=aFiles,
+                sSelected=sSelected,
+                sPath=sPath,
+                sDir=sDir,
+                sFile=sFile
+            )
 
         return redirect(request.path+"?sSelected="+sSelected)
     
@@ -160,12 +183,13 @@ def index():
     print("[!] PATH 2:"+sPath+", "+sDir)
 
     try:
-        aFiles = sorted([f for f in listdir(sPath) if isfile(join(sPath, f))])
-        aDirs = sorted([f for f in listdir(sPath) if isdir(join(sPath, f))])
-        aFilesInfoTemp = [os.stat(os.path.join(sPath, f)) for f in aFiles]
-        aFilesInfo = []
-        for iI, oI in enumerate(aFilesInfoTemp):
-            aFilesInfo.append({'human_size': sizeof_fmt(oI.st_size)})
+        if sPath!='':
+            aFiles = sorted([f for f in listdir(sPath) if isfile(join(sPath, f))])
+            aDirs = sorted([f for f in listdir(sPath) if isdir(join(sPath, f))])
+            aFilesInfoTemp = [os.stat(os.path.join(sPath, f)) for f in aFiles]
+            aFilesInfo = []
+            for iI, oI in enumerate(aFilesInfoTemp):
+                aFilesInfo.append({'human_size': sizeof_fmt(oI.st_size)})
     except RuntimeError as e:
         print("[E] ERROR:"+e)
         pass
@@ -187,26 +211,28 @@ is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
 
 @app.route("/getfile")
 def getfile():
+    bDownload = request.args.get('bDownload', '')
     sFullPath = request.args.get('sFullPath', '')
     print("[!] >> "+sFullPath)
 
-    if re.search(r"djvu$", sFullPath):
-        sFileName = os.path.basename(sFullPath)+'.pdf'
-        sTmpFile = '/tmp/'+sFileName
-        print("[!] >> "+sTmpFile)
-        if not os.path.isfile(sTmpFile):
-            sCMD = 'ddjvu -format=pdf -quality=85 "'+sFullPath+'" "'+sTmpFile+'" '
-            os.system(sCMD)
-        sFullPath = sTmpFile
+    if bDownload != '1':
+        if re.search(r"djvu$", sFullPath):
+            sFileName = os.path.basename(sFullPath)+'.pdf'
+            sTmpFile = '/tmp/'+sFileName
+            print("[!] >> "+sTmpFile)
+            if not os.path.isfile(sTmpFile):
+                sCMD = 'ddjvu -format=pdf -quality=85 "'+sFullPath+'" "'+sTmpFile+'" '
+                os.system(sCMD)
+            sFullPath = sTmpFile
 
-    if re.search(r"docx$", sFullPath):
-        sFileName = os.path.basename(sFullPath)+'.pdf'
-        sTmpFile = '/tmp/'+sFileName
-        print("[!] >> "+sTmpFile)
-        if not os.path.isfile(sTmpFile):
-            sCMD = 'unoconv -f pdf -o "'+sTmpFile+'" "'+sFullPath+'"'
-            os.system(sCMD)
-        sFullPath = sTmpFile
+        if re.search(r"docx$", sFullPath):
+            sFileName = os.path.basename(sFullPath)+'.pdf'
+            sTmpFile = '/tmp/'+sFileName
+            print("[!] >> "+sTmpFile)
+            if not os.path.isfile(sTmpFile):
+                sCMD = 'unoconv -f pdf -o "'+sTmpFile+'" "'+sFullPath+'"'
+                os.system(sCMD)
+            sFullPath = sTmpFile
 
     if not os.path.isfile(sFullPath):
         return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>"
@@ -229,6 +255,9 @@ def preview():
 
     sFullPath = os.path.join(sFullPath, sFile)
 
+    if not os.path.isfile(sFullPath):
+        return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>" 
+    
     oRegImgExt = re.compile(r"(APNG|AVIF|GIF|JPG|JPEG|PNG|SVG|BMP|ICO|TIFF)$", re.IGNORECASE)
     
     if (oRegImgExt.search(sFile)):
@@ -244,9 +273,6 @@ def preview():
         return render_template('preview_pdf.html', 
             sFullPath="/getfile?sFullPath="+urllib.parse.quote(sFullPath)
         )
-
-    if not os.path.isfile(sFullPath):
-        return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>" 
     
     if is_binary_string(open(sFullPath, 'rb').read(1024)):
         return "<h1>Бинарный файл</h1><p>"+sFullPath+"</p>" 

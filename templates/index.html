@@ -30,6 +30,11 @@
             {% if sSelected %}
             <div class="right-panel-block">
                 <form action="" method="get">
+                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
+                    <input type="hidden" id="sPath" name="sPath" value="{{sPath}}" />
+                    <input type="hidden" id="sDir" name="sDir" value="{{sDir}}" />
+                    <input type="hidden" id="sFile" name="sFile" value="{{sFile}}" />
+
                     <div class="header"><b>Директории:</b> {{sPath}}</div>
                     <div class="btn-group">
                         <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-left"></i></a>
@@ -48,7 +53,7 @@
                         {% for sDir in aDirs %}
                             <div class="input-group dir-row">
                                 <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" value="{{sDir}}" name="files[]" />
+                                    <input class="form-check-input mt-0" type="checkbox" value="{{sDir}}" name="dirs[]" />
                                 </div>
                                 
                                 <a 
@@ -61,18 +66,24 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
                 </form>
             </div>
             <div class="right-panel-block">
                 <form action="" method="get">
+                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
+                    <input type="hidden" id="sPath" name="sPath" value="{{sPath}}" />
+                    <input type="hidden" id="sDir" name="sDir" value="{{sDir}}" />
+                    <input type="hidden" id="sFile" name="sFile" value="{{sFile}}" />
+
                     <div class="header"><b>Файлы</b></div>
                     <div class="btn-group">
-                        <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page">Обновить</a>
-                        <button class="btn btn-success" type="submit" name="action" value="create_file">Создать</button>
-                        <button class="btn btn-secondary" type="submit" name="action" value="copy_file">Копировать</button>
-                        <button class="btn btn-danger" type="submit" name="action" value="remove_file">Удалить</button>
-                        <button class="btn btn-danger" type="submit" name="action" value="clean_files">Очистить</button>
+                        <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page"><i class="bi bi-arrow-repeat"></i></a>
+                        <button class="btn btn-success" type="submit" name="action" value="create_file"><i class="bi bi-file-plus"></i></button>
+                        <button class="btn btn-secondary" type="submit" name="action" value="copy_file"><i class="bi bi-files"></i></button>
+                        <button class="btn btn-danger" type="submit" name="action" value="remove_file"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-danger" type="submit" name="action" value="clean_files"><i class="bi bi-trash-fill"></i></button>
+                        <button class="btn btn-secondary" type="submit" name="action" value="upload_files"><i class="bi bi-upload"></i></button>
+                        <button class="btn btn-secondary" type="submit" name="action" value="download_files"><i class="bi bi-download"></i></button>
                         <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks-grid"></i></a>
                         <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks"></i></a>
                     </div>
@@ -95,7 +106,6 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
                 </form>
             </div>
             {% endif %}
