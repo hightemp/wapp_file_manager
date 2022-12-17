@@ -1,19 +1,7 @@
 from flask import g, Flask, render_template, request, send_file, redirect, session, jsonify
-from werkzeug.utils import secure_filename
-from hurry.filesize import size
-from datetime import datetime
-from flask_fontawesome import FontAwesome
-from flask_qrcode import QRcode
-from pathlib import Path
 import os
-import mimetypes
-import sys
 import re
-import json
-import zipfile
-import filetype
 import sqlite3
-import glob
 import re
 import base64
 import urllib.parse

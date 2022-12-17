@@ -1,4 +1,5 @@
 #!/bin/bash
 
-sudo apt install djvulibre-bin
-sudo apt-get install unoconv
+sudo apt install -y \
+    djvulibre-bin \
+    unoconv
