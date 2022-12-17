@@ -195,7 +195,16 @@ def getfile():
         sTmpFile = '/tmp/'+sFileName
         print("[!] >> "+sTmpFile)
         if not os.path.isfile(sTmpFile):
-            sCMD = 'ddjvu -format=pdf -quality=85 -verbose "'+sFullPath+'" "'+sTmpFile+'" '
+            sCMD = 'ddjvu -format=pdf -quality=85 "'+sFullPath+'" "'+sTmpFile+'" '
+            os.system(sCMD)
+        sFullPath = sTmpFile
+
+    if re.search(r"docx$", sFullPath):
+        sFileName = os.path.basename(sFullPath)+'.pdf'
+        sTmpFile = '/tmp/'+sFileName
+        print("[!] >> "+sTmpFile)
+        if not os.path.isfile(sTmpFile):
+            sCMD = 'unoconv -f pdf -o "'+sTmpFile+'" "'+sFullPath+'"'
             os.system(sCMD)
         sFullPath = sTmpFile
 
@@ -204,7 +213,7 @@ def getfile():
 
     resp = Response(open(sFullPath, 'rb').read())
 
-    if re.search(r"pdf$", sFullPath):    
+    if re.search(r"(pdf|docx)$", sFullPath):    
         resp.headers['Content-Type'] = 'application/pdf'
     
     return resp
@@ -229,7 +238,7 @@ def preview():
             sFullSizeBase64Code=base64.b64encode(open(sFullPath,'rb').read()).decode('utf-8')
         )
 
-    oRegPDFExt = re.compile(r"(PDF|DJVU)$", re.IGNORECASE)
+    oRegPDFExt = re.compile(r"(PDF|DJVU|DOCX)$", re.IGNORECASE)
     
     if (oRegPDFExt.search(sFile)):
         return render_template('preview_pdf.html', 

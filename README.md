@@ -8,3 +8,9 @@
 - Есть просмотр DJVU с конвертацией в PDF
 
 ![](screenshots/2022-12-17_18-16.png)
+
+## Зависимости
+
+- apt пакеты
+    - djvulibre-bin
+    - unoconv
