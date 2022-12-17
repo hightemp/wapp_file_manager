@@ -40,11 +40,11 @@
                         <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-left"></i></a>
                         <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-right"></i></a>
                         <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-up"></i></a>
-                        <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page">Обновить</a>
-                        <button class="btn btn-success" type="submit" name="action" value="create_dir">Создать</button>
-                        <button class="btn btn-secondary" type="submit" name="action" value="copy_dir">Копировать</button>
-                        <button class="btn btn-danger" type="submit" name="action" value="remove_dir">Удалить</button>
-                        <button class="btn btn-danger" type="submit" name="action" value="clean_dirs">Очистить</button>
+                        <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page"><i class="bi bi-arrow-repeat"></i></a>
+                        <button class="btn btn-success" type="submit" name="action" value="create_dir"><i class="bi bi-file-plus"></i></button>
+                        <button class="btn btn-secondary" type="submit" name="action" value="copy_dir"><i class="bi bi-files"></i></button>
+                        <button class="btn btn-danger" type="submit" name="action" value="remove_dir"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-danger" type="submit" name="action" value="clean_dirs"><i class="bi bi-trash-fill"></i></button>
                     </div>
                     <div class="list-group right-panel-list dirs-list">
                         {% if aDirs|length == 0 %}
