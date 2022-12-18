@@ -155,6 +155,7 @@ def index():
         get_db().commit()
     
     aTabs = query_db('SELECT * FROM tabs')
+    aExitstsTabs = [os.path.isdir(f[2]) for f in aTabs]
     # print(aTabs)
 
     aCurTab = query_db('SELECT * FROM tabs WHERE id=? LIMIT 1', (sSelected,))
@@ -171,7 +172,7 @@ def index():
     print("[!] PATH 2:"+sPath+", "+sDir)
 
     try:
-        if sPath!='':
+        if sPath!='' and os.path.isdir(sPath):
             aFiles = sorted([f for f in listdir(sPath) if isfile(join(sPath, f))])
             aDirs = sorted([f for f in listdir(sPath) if isdir(join(sPath, f))])
             aFilesInfoTemp = [os.stat(os.path.join(sPath, f)) for f in aFiles]
@@ -183,7 +184,9 @@ def index():
         pass
 
     return render_template('index.html', 
-        sSelected=sSelected, aTabs=aTabs, 
+        sSelected=sSelected, 
+        aTabs=aTabs, 
+        aExitstsTabs=aExitstsTabs,
         sPath=sPath,
         aDirs=aDirs, 
         aFiles=aFiles,
