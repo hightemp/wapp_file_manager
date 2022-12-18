@@ -76,6 +76,7 @@
                     <input type="hidden" id="sPath" name="sPath" value="{{sPath}}" />
                     <input type="hidden" id="sDir" name="sDir" value="{{sDir}}" />
                     <input type="hidden" id="sFile" name="sFile" value="{{sFile}}" />
+                    <input type="hidden" id="sFileExt" name="sFileExt" value="{{sFileExt}}" />
 
                     <div class="header"><b>Файлы</b></div>
                     <div class="btn-group">
@@ -93,20 +94,36 @@
                         {% if aFiles|length == 0 %}
                         <div class="nothing-found-row">Ничего не найдено..</div>
                         {% endif %}
-                        {% for sFile in aFiles %}
-                            <div class="input-group file-row">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]" />
+                        <div class="files-grouped">
+                            <div class="files-grouped-ext">
+                                {% for sExt in oGroupedFiles %}
+                                <div class="input-group ext-row">
+                                    <a 
+                                        class="list-group-item list-group-item-action {{ 'active' if sFileExt|string == sExt|string }}" 
+                                        href="?sSelected={{sSelected}}&sFileExt={{sExt}}"
+                                    >
+                                        <div>{{ sExt }}</div>
+                                    </a>
                                 </div>
-                                <a 
-                                    class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
-                                    href="?sSelected={{sSelected}}&sFile={{sFile}}"
-                                >
-                                    <div>{{ sFile }}</div>
-                                    <small>{{ aFilesInfo[loop.index-1].human_size }}</small>
-                                </a>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                            <div class="files-grouped-files">
+                                {% for sFile in aFiles %}
+                                <div class="input-group file-row">
+                                    <div class="input-group-text">
+                                        <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]" />
+                                    </div>
+                                    <a 
+                                        class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
+                                        href="?sSelected={{sSelected}}&sFileExt={{sFileExt}}&sFile={{sFile}}"
+                                    >
+                                        <div>{{ sFile }}</div>
+                                        <small>{{ aFilesInfo[loop.index-1].human_size }}</small>
+                                    </a>
+                                </div>
+                                {% endfor %}    
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

@@ -61,6 +61,7 @@ def index():
     sPath = request.args.get('sPath', '')
     sDir = request.args.get('sDir', '')
     sFile = request.args.get('sFile', '')
+    sFileExt = request.args.get('sFileExt', 'Все')
 
     print("[>]", request.args)
     if ("action" in request.args):
@@ -148,6 +149,7 @@ def index():
     aFiles = []
     aDirs = []
     aFilesInfo = []
+    oGroupedFiles = dict()
 
     if sPath != '':
         print('[!] SAVED:'+sPath)
@@ -175,8 +177,22 @@ def index():
         if sPath!='' and os.path.isdir(sPath):
             aFiles = sorted([f for f in listdir(sPath) if isfile(join(sPath, f))])
             aDirs = sorted([f for f in listdir(sPath) if isdir(join(sPath, f))])
+
+            # NOTE: Группировка файлов по расширениям
+            oGroupedFiles['Все'] = aFiles
+            for sFileN in aFiles:
+                aExt = sFileN.split('.')
+                sExt = '.'
+                if aExt[0] != '':
+                    sExt = aExt.pop()
+                if not oGroupedFiles.get(sExt, ''):
+                    oGroupedFiles[sExt] = []
+                oGroupedFiles[sExt].append(sFileN)
+
+            aFiles = oGroupedFiles[sFileExt]
             aFilesInfoTemp = [os.stat(os.path.join(sPath, f)) for f in aFiles]
             aFilesInfo = []
+
             for iI, oI in enumerate(aFilesInfoTemp):
                 aFilesInfo.append({'human_size': sizeof_fmt(oI.st_size)})
     except RuntimeError as e:
@@ -186,11 +202,13 @@ def index():
     return render_template('index.html', 
         sSelected=sSelected, 
         aTabs=aTabs, 
+        sFileExt=sFileExt,
         aExitstsTabs=aExitstsTabs,
         sPath=sPath,
         aDirs=aDirs, 
         aFiles=aFiles,
         aFilesInfo=aFilesInfo,
+        oGroupedFiles=oGroupedFiles,
         sCurDir=sDir,
         sCurFile=sFile,
         sPreviewURL=sPreviewURL,

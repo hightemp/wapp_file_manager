@@ -143,3 +143,28 @@ body, html {
 .rsync-output-panel {
     
 }
+
+.files-grouped {
+    overflow-y: hidden;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+}
+
+.files-grouped-ext {
+    width: 100px;
+    overflow-y: scroll;
+    height: calc(50vh - 60px)
+}
+
+.ext-row .list-group-item {
+    border-bottom: none;
+}
+
+.file-row .list-group-item {
+    word-break: break-all;
+}
+
+.files-grouped-files {
+    overflow-y: scroll;
+    height: calc(50vh - 30px)
+}
