@@ -354,6 +354,32 @@ sched = BackgroundScheduler(daemon=True)
 sched.add_job(sensor,'interval',minutes=1)
 sched.start()
 
+@app.route("/find")
+def find():
+
+    if ("action" in request.args):
+        if request.args["action"]=="find_add":
+            pass
+        if request.args["action"]=="find_edit":
+            pass
+        if request.args["action"]=="find_remove":
+            pass
+    
+    return render_template('find.html')
+
+@app.route("/mounts")
+def mounts():
+    
+    if ("action" in request.args):
+        if request.args["action"]=="mounts_add":
+            pass
+        if request.args["action"]=="mounts_edit":
+            pass
+        if request.args["action"]=="mounts_remove":
+            pass
+    
+    return render_template('mounts.html')
+
 @app.route("/rsync")
 def rsync():
     
@@ -388,6 +414,10 @@ def rsync():
             # get_db().commit()
 
     return render_template('rsync_list.html')
+
+@app.route("/favorites", methods=['GET', 'POST'])
+def favorites():
+    return render_template('favorites.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

@@ -7,7 +7,10 @@
                 <a href="/tabs_add?sSelected={{ sSelected }}" class="btn btn-success" title="Создать" ><i class="bi bi-file-plus"></i></a>
                 <a href="/tabs_remove?sSelected={{ sSelected }}" class="btn btn-danger" title="Удалить"><i class="bi bi-trash"></i></a>
                 <a href="/tabs_clean?sSelected={{ sSelected }}" class="btn btn-danger" title="Очистить"><i class="bi bi-trash-fill"></i></a>
-                <a href="/rsync" class="btn btn-info" title="rsync"><i class="bi bi-arrow-left-right"></i></i></a>
+                <a href="/rsync" class="btn btn-info" title="rsync"><i class="bi bi-arrow-left-right"></i></a>
+                <a href="/favorites" class="btn btn-secondary" title="Избранное"><i class="bi bi-journal-bookmark"></i></a>
+                <a href="/find" class="btn btn-secondary" title="Поиск"><i class="bi bi-search"></i></a>
+                <a href="/mounts" class="btn btn-secondary" title="Маунты"><i class="bi bi-disc"></i></a>
             </div>
             <div class="list-group left-panel-list">
                 {% for oTab in aTabs %}
@@ -136,8 +139,8 @@
 
     <script>
         $(document).ready(() => {
-            $(".dirs-list").scrollTo($(".dirs-list .list-group-item.active"), {offset: {top:-100}})
-            $(".files-list").scrollTo($(".files-list .list-group-item.active"), {offset: {top:-100}})
+            $(".dirs-list").scrollTo($(".dirs-list .list-group-item.active"))
+            $(".files-list").scrollTo($(".files-list .list-group-item.active"))
         })
     </script>
 {% include "b_footer.html" %}
