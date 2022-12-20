@@ -3,7 +3,7 @@ Description=wapp_file_manager
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/env gunicorn --chdir /srv/apps/wapp_file_manager -w 12 main:app
+ExecStart=/usr/bin/env gunicorn --chdir /srv/apps/wapp_file_manager -b 0.0.0.0:5000 -w 12 main:app
 
 [Install]
 WantedBy=multi-user.target
