@@ -44,3 +44,25 @@ CREATE TABLE rsync_sync_processes (
     stdout TEXT NULL,
     stderror TEXT NULL
 );
+
+DROP TABLE IF EXISTS fav_groups;
+CREATE TABLE fav_groups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS fav_categories;
+CREATE TABLE fav_categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    group_id INTEGER NULL,
+    parent_id INTEGER NULL
+);
+
+DROP TABLE IF EXISTS fav_files;
+CREATE TABLE fav_files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    path TEXT NOT nULL,
+    category_id INTEGER NULL
+);
