@@ -12,7 +12,7 @@
 ## Запуск
 
 ```
-python3 release.zip
+python3 v0.3.2.1671742104.zip
 # или
 python3 __main__.py
 ```

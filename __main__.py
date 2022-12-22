@@ -61,7 +61,7 @@ def sizeof_fmt(num, suffix="B"):
 #         io.BytesIO(bytearray(dFiles[path])),
 #         download_name=sBaseName,
 #         mimetype=sContentType
-    )
+# )
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
