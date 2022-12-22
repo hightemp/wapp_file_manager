@@ -6,10 +6,10 @@ import re
 import base64
 import urllib.parse
 from flask import Response
-import mimetypes
 
-from static_packed import dFiles
-import io
+import mimetypes
+# from static_packed import dFiles
+# import io
 
 app = Flask(__name__)
 
@@ -47,20 +47,20 @@ def sizeof_fmt(num, suffix="B"):
         num /= 1024.0
     return f"{num:.1f}Yi{suffix}"
 
-@app.route("/static_dyn/<path:path>", methods=['GET', 'POST'])
-def static_dyn(path):
-    path = "./static/"+path
-    # sContentType = request.headers['Accept'].split(',')[0]
-    sContentType = mimetypes.guess_type(path)[1]
-    print(sContentType)
-    sBaseName = os.path.basename(path)
-    # response = make_response(image_binary)
-    # response.headers.set('Content-Type', 'image/jpeg')
-    # return dFiles[path]
-    return send_file(
-        io.BytesIO(bytearray(dFiles[path])),
-        download_name=sBaseName,
-        mimetype=sContentType
+# @app.route("/static_dyn/<path:path>", methods=['GET', 'POST'])
+# def static_dyn(path):
+#     path = "./static/"+path
+#     # sContentType = request.headers['Accept'].split(',')[0]
+#     sContentType = mimetypes.guess_type(path)[1]
+#     print(sContentType)
+#     sBaseName = os.path.basename(path)
+#     # response = make_response(image_binary)
+#     # response.headers.set('Content-Type', 'image/jpeg')
+#     # return dFiles[path]
+#     return send_file(
+#         io.BytesIO(bytearray(dFiles[path])),
+#         download_name=sBaseName,
+#         mimetype=sContentType
     )
 
 @app.route("/", methods=['GET', 'POST'])
