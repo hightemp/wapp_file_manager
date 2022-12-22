@@ -15,5 +15,5 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-echo "[!] " gh release create $VERSION -t $VERSION -n '""'
-gh release create $VERSION -t $VERSION -n ""
+echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
+gh release create $VERSION -t $VERSION -n "" --target main
