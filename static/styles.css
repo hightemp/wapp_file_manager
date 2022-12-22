@@ -1,5 +1,6 @@
 :root {
     --icon-size: 20px;
+    font-size: 12px;
 }
 
 body, html {
@@ -167,4 +168,22 @@ body, html {
 .files-grouped-files {
     overflow-y: scroll;
     height: calc(50vh - 30px)
+}
+
+.file-size {
+    display: inline-block;
+    width: 50px;
+    color: rgba(0,0,0,0.5);
+}
+
+.file-full-path {
+    color: rgba(150,150,150,0.5);
+}
+
+.active .file-size {
+    color: rgba(255,255,255,0.5);
+}
+
+.active .file-full-path {
+    color: rgba(255,255,255,0.5);
 }

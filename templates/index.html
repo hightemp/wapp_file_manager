@@ -121,7 +121,8 @@
                                         href="?sSelected={{sSelected}}&sFileExt={{sFileExt}}&sFile={{sFile}}"
                                     >
                                         <div>{{ sFile }}</div>
-                                        <small>{{ aFilesInfo[loop.index-1].human_size }}</small>
+                                        <small class="file-size">{{ aFilesInfo[loop.index-1].human_size }}</small>
+                                        <small class="file-full-path">{{ sPath }}/{{ sFile }}</small>
                                     </a>
                                 </div>
                                 {% endfor %}    

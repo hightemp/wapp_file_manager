@@ -1,3 +1,0 @@
-import main
-
-print("START")
