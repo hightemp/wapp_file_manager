@@ -3,3 +3,5 @@ database.db
 static_packed.py
 build
 dist
+main.build
+main.bin
