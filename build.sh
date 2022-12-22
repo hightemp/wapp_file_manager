@@ -1,9 +1,11 @@
 #!/bin/bash
 
+nuitka3 --standalone --onefile main.py
+
 # pyinstaller -F main.py
 # # cp dist/main wapp_file_manager
 
-# exit
+exit
 
 # https://stackoverflow.com/questions/39913847/is-there-a-way-to-compile-a-python-application-into-static-binary
 PY=python3
