@@ -6,7 +6,7 @@
 # exit
 
 # https://stackoverflow.com/questions/39913847/is-there-a-way-to-compile-a-python-application-into-static-binary
-PY=python38
+PY=python3
 CPY=cython
 $CPY main.py --embed
 PYTHONLIBVER=python$($PY -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')$($PY-config --abiflags)
