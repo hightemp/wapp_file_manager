@@ -42,4 +42,4 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-gh release create $VERSION -t $VERSION -n "" $CFILE
+/usr/bin/gh release create $VERSION -t $VERSION -n "" $CFILE
