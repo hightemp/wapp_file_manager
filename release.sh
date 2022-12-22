@@ -43,5 +43,5 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-echo gh release create $VERSION -t $VERSION -n '""' ./$CFILE
-gh release create $VERSION -t $VERSION -n "" ./$CFILE
+echo gh release create $VERSION -t $VERSION -n '""' $CFILE
+gh release create $VERSION -t $VERSION -n "" $CFILE
