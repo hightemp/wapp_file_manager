@@ -1,3 +1,5 @@
 __pycache__
 database.db
 static_packed.py
+build
+dist

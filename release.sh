@@ -1,4 +1,5 @@
-CFILE=wapp_file_manager
+# CFILE=wapp_file_manager
+CFILE=./dist/main
 
 ./build.sh
 
@@ -18,14 +19,14 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-upx --best ./$CFILE
+# upx --best ./$CFILE
 
-if [ "$?" != "0" ]; then
-    echo "====================================================="
-    echo "ERROR"
-    echo
-    exit 1
-fi
+# if [ "$?" != "0" ]; then
+#     echo "====================================================="
+#     echo "ERROR"
+#     echo
+#     exit 1
+# fi
 
 timestamp=$(date +%s)
 VERSION=$(echo `cat VERSION`.$timestamp)
