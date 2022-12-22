@@ -11,10 +11,17 @@
 
 ## Запуск
 
-```
+```bash
 python3 v0.3.2.1671742104.zip
 # или
 python3 __main__.py
+```
+
+## Упаковка
+
+```bash
+# https://docs.python.org/3/library/zipapp.html
+python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
 ```
 
 ## Зависимости
