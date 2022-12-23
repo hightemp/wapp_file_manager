@@ -5,11 +5,13 @@ import sqlite3
 import re
 import base64
 import urllib.parse
+
 from flask import Response
 import importlib.resources
 import jinja2
-from jinja2 import Environment, BaseLoader
+from jinja2 import Template, FunctionLoader, Environment, BaseLoader
 from flask import Flask
+import mimetypes
 
 # importlib.resources.read_text(__package__, "data.txt")
 
@@ -21,21 +23,24 @@ import zipfile
 
 def readfile(sFilePath):
     with zipfile.ZipFile(os.path.dirname(__file__)) as z:
-        print("[!] "+z.namelist())
-        with z.open(sFilePath, 'r') as f:
+        # print(z.namelist())
+        with z.open(sFilePath) as f:
             print("[!] "+f.name)
-            return str(f.read())
+            # print("[!] "+f.read().decode("utf-8"))
+            return f.read()
     return "ERROR"
 
 # def readfile(sFilePath, sBasePath=__package__):
 #     return importlib.resources.read_text(sBasePath, sFilePath)
 
 def load_template(name):
-    return readfile("templates/"+name)
+    return readfile("templates/"+name).decode("utf-8")
+
+oTempFunctionLoader = FunctionLoader(load_template)
 
 def render_template(name, **kwargs):
     data = load_template(name)
-    tpl = Environment(loader=BaseLoader).from_string(data)
+    tpl = Environment(loader=oTempFunctionLoader).from_string(data)
     return tpl.render(**kwargs)
 
 def get_db():
@@ -48,7 +53,7 @@ def init_db():
     with app.app_context():
         db = get_db()
         # with app.open_resource('schema.sql', mode='r') as f:
-        sSQL = readfile("schema.sql")
+        sSQL = readfile("schema.sql").decode("utf-8")
         db.cursor().executescript(sSQL)
         db.cursor().executescript(sSQL)
         db.commit()
@@ -71,6 +76,10 @@ def sizeof_fmt(num, suffix="B"):
             return f"{num:3.1f}{unit}{suffix}"
         num /= 1024.0
     return f"{num:.1f}Yi{suffix}"
+
+@app.route("/static_dyn/<path:path>", methods=['GET', 'POST'])
+def static_dyn(path):
+    return Response(readfile("static/"+path), mimetype=mimetypes.guess_type(path)[0])
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
