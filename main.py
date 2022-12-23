@@ -21,10 +21,11 @@ import zipfile
 
 def readfile(sFilePath):
     with zipfile.ZipFile(os.path.dirname(__file__)) as z:
-        print(z.namelist())
-        with z.open(sFilePath) as f:
-            print(f.name)
-            return f.read()
+        print("[!] "+z.namelist())
+        with z.open(sFilePath, 'r') as f:
+            print("[!] "+f.name)
+            return str(f.read())
+    return "ERROR"
 
 # def readfile(sFilePath, sBasePath=__package__):
 #     return importlib.resources.read_text(sBasePath, sFilePath)
