@@ -20,8 +20,11 @@ gh release create $VERSION -t $VERSION -n "" --target main
 
 # CFILE=wapp_file_manager.pyz
 
-# cd ..
-# python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
+cd ..
+python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
+
+echo $PWD/wapp_file_manager.pyz
+
 # mv wapp_file_manager.pyz ./wapp_file_manager
 # cd wapp_file_manager
 
