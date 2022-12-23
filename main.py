@@ -8,6 +8,7 @@ import urllib.parse
 from flask import Response
 import importlib.resources
 import jinja2
+from jinja2 import Environment, BaseLoader
 from flask import Flask
 
 # importlib.resources.read_text(__package__, "data.txt")
@@ -33,7 +34,7 @@ def load_template(name):
 
 def render_template(name, **kwargs):
     data = load_template(name)
-    tpl = template.from_string(data)
+    tpl = Environment(loader=BaseLoader).from_string(data)
     return tpl.render(**kwargs)
 
 def get_db():
