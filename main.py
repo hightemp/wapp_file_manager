@@ -16,11 +16,11 @@ app = Flask(__name__)
 
 DATABASE = './database.db'
 
-def readfile(sFilePath):
-    return importlib.resources.read_text(__package__, sFilePath)
+def readfile(sFilePath, sBasePath=__package__):
+    return importlib.resources.read_text(sBasePath, sFilePath)
 
 def load_template(name):
-    return readfile("templates/"+name)
+    return readfile("templates", name)
 
 def render_template(name, **kwargs):
     data = load_template(name)
