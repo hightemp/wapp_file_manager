@@ -12,9 +12,9 @@
 ## Запуск
 
 ```bash
-python3 v0.3.2.1671742104.zip
-# или
-python3 __main__.py
+wget https://github.com/hightemp/wapp_file_manager/releases/latest/download/wapp_file_manager.pyz
+chmod a+x ./wapp_file_manager.pyz
+./wapp_file_manager.pyz
 ```
 
 ## Упаковка
