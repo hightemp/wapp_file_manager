@@ -1,4 +1,4 @@
-from flask import g, Flask, render_template, request, send_file, redirect, session, jsonify
+from flask import g, Flask, request, send_file, redirect, session, jsonify
 import os
 import re
 import sqlite3
@@ -8,6 +8,7 @@ import urllib.parse
 from flask import Response
 import importlib.resources
 import jinja2
+from flask import Flask
 
 # importlib.resources.read_text(__package__, "data.txt")
 
@@ -21,7 +22,10 @@ def readfile(sFilePath):
 def load_template(name):
     return readfile("templates/"+name)
 
-jinja2.FunctionLoader(load_template)
+def render_template(name, **kwargs):
+    data = load_template(name)
+    tpl = template.from_string(data)
+    return tpl.render(**kwargs)
 
 def get_db():
     db = getattr(g, '_database', None)
