@@ -20,7 +20,7 @@ def readfile(sFilePath, sBasePath=__package__):
     return importlib.resources.read_text(sBasePath, sFilePath)
 
 def load_template(name):
-    return readfile("templates", name)
+    return readfile(__package__+".templates", name)
 
 def render_template(name, **kwargs):
     data = load_template(name)
