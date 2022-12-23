@@ -16,11 +16,20 @@ app = Flask(__name__)
 
 DATABASE = './database.db'
 
-def readfile(sFilePath, sBasePath=__package__):
-    return importlib.resources.read_text(sBasePath, sFilePath)
+import zipfile
+
+def readfile(sFilePath):
+    with zipfile.ZipFile(os.path.dirname(__file__)) as z:
+        print(z.namelist())
+        with z.open(sFilePath) as f:
+            print(f.name)
+            return f.read()
+
+# def readfile(sFilePath, sBasePath=__package__):
+#     return importlib.resources.read_text(sBasePath, sFilePath)
 
 def load_template(name):
-    return readfile(__package__+".templates", name)
+    return readfile("templates/"+name)
 
 def render_template(name, **kwargs):
     data = load_template(name)
