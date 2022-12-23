@@ -25,6 +25,8 @@ python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
 
 echo $PWD/wapp_file_manager.pyz
 
+gh release upload $VERSION $PWD/wapp_file_manager.pyz --clobber
+
 # mv wapp_file_manager.pyz ./wapp_file_manager
 # cd wapp_file_manager
 
