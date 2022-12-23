@@ -79,7 +79,9 @@ def sizeof_fmt(num, suffix="B"):
 
 @app.route("/static_dyn/<path:path>", methods=['GET', 'POST'])
 def static_dyn(path):
-    return Response(readfile("static/"+path), mimetype=mimetypes.guess_type(path)[0])
+    oR = Response(readfile("static/"+path), mimetype=mimetypes.guess_type(path)[0])
+    oR.headers['Cache-Control'] = 'max-age=60480000, stale-if-error=8640000, must-revalidate'
+    return oR
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
