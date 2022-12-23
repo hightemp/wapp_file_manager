@@ -65,7 +65,10 @@ def sizeof_fmt(num, suffix="B"):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    if (request.args.get('init_db', '')=='1'):
+    try:
+        get_db().execute("SEELECT * FROM tabs")
+    except:
+        # if (request.args.get('init_db', '')=='1'):
         print("=========================================================")
         print("INIT DB")
         init_db()
