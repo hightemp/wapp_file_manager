@@ -15,8 +15,10 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
-gh release create $VERSION -t $VERSION -n "" --target main
+# echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
+# gh release create $VERSION -t $VERSION -n "" --target main
+
+CFILE=wapp_file_manager.pyz
 
 cd ..
 python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
