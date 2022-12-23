@@ -2,23 +2,23 @@
 # CFILE=./dist/main
 CFILE=wapp_file_manager.pyz
 
-./build.sh
+# ./build.sh
 
-if [ "$?" != "0" ]; then
-    echo "====================================================="
-    echo "ERROR"
-    echo
-    exit 1
-fi
+# if [ "$?" != "0" ]; then
+#     echo "====================================================="
+#     echo "ERROR"
+#     echo
+#     exit 1
+# fi
 
-strip -s ./$CFILE
+# strip -s ./$CFILE
 
-if [ "$?" != "0" ]; then
-    echo "====================================================="
-    echo "ERROR"
-    echo
-    exit 1
-fi
+# if [ "$?" != "0" ]; then
+#     echo "====================================================="
+#     echo "ERROR"
+#     echo
+#     exit 1
+# fi
 
 # upx --best ./$CFILE
 
