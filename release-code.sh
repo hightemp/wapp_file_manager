@@ -15,15 +15,15 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-# echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
-# gh release create $VERSION -t $VERSION -n "" --target main
+echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
+gh release create $VERSION -t $VERSION -n "" --target main
 
-CFILE=wapp_file_manager.pyz
+# CFILE=wapp_file_manager.pyz
 
-cd ..
-python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
-mv wapp_file_manager.pyz ./wapp_file_manager
-cd wapp_file_manager
+# cd ..
+# python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
+# mv wapp_file_manager.pyz ./wapp_file_manager
+# cd wapp_file_manager
 
-echo gh release create $VERSION -t $VERSION -n '""' $CFILE
-gh release create $VERSION -t $VERSION -n "" $CFILE
+# echo gh release create $VERSION -t $VERSION -n '""' $CFILE
+# gh release create $VERSION -t $VERSION -n "" $CFILE
