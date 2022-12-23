@@ -17,3 +17,11 @@ fi
 
 echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
 gh release create $VERSION -t $VERSION -n "" --target main
+
+cd ..
+python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
+mv wapp_file_manager.pyz ./wapp_file_manager
+cd wapp_file_manager
+
+echo gh release create $VERSION -t $VERSION -n '""' $CFILE
+gh release create $VERSION -t $VERSION -n "" $CFILE
