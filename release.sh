@@ -1,5 +1,6 @@
 # CFILE=wapp_file_manager
-CFILE=./dist/main
+# CFILE=./dist/main
+CFILE=wapp_file_manager.pyz
 
 ./build.sh
 
@@ -42,6 +43,10 @@ if [ "$?" != "0" ]; then
     echo
     exit 1
 fi
+
+cd ..
+
+python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
 
 echo gh release create $VERSION -t $VERSION -n '""' $CFILE
 gh release create $VERSION -t $VERSION -n "" $CFILE
