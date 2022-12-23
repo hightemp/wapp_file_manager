@@ -65,10 +65,7 @@ def sizeof_fmt(num, suffix="B"):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    try:
-        cur = get_db().cursor()
-        cur.execute("SELECT * FROM tabs")
-    except sqlite3.Error as er:
+    if not os.path.isfile(DATABASE):
         # if (request.args.get('init_db', '')=='1'):
         print("=========================================================")
         print("INIT DB")
