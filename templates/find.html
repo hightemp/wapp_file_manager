@@ -1,0 +1,14 @@
+{% import "macros.html" as macros %}
+{% include "b_header.html" %}
+
+<form action="">
+
+{{ macros.form_hidden_fields(oR.oArgs) }}
+
+    <div class="wrapper">
+        {% include "menu.html" %}
+    </div>
+
+</form>
+
+{% include "b_footer.html" %}

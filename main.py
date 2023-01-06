@@ -22,6 +22,12 @@ from database import *
 from baselib import *
 import pydotenv
 
+import sysrsync
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+
 app = Flask(__name__)
 
 @app.route("/zip/static/<path:path>", methods=['GET', 'POST'])
@@ -30,19 +36,35 @@ def static_dyn(path):
     oR.headers['Cache-Control'] = 'max-age=60480000, stale-if-error=8640000, must-revalidate'
     return oR
 
+# request.method:              GET
+# request.url:                 http://127.0.0.1:5000/alert/dingding/test?x=y
+# request.base_url:            http://127.0.0.1:5000/alert/dingding/test
+# request.url_charset:         utf-8
+# request.url_root:            http://127.0.0.1:5000/
+# str(request.url_rule):       /alert/dingding/test
+# request.host_url:            http://127.0.0.1:5000/
+# request.host:                127.0.0.1:5000
+# request.script_root:
+# request.path:                /alert/dingding/test
+# request.full_path:           /alert/dingding/test?x=y
+
+# request.args:                ImmutableMultiDict([('x', 'y')])
+# request.args.get('x'):       y
+
 @app.route("/", methods=['GET', 'POST'])
 def index():
     oR = RequestVars()
-    oR.sBaseURL = request.url
 
     fnPrepareArgs(oR)
 
     if "create-dir" in oR.oArgs:
-        return render_template('dir_create.html', oR=oR)
+        return render_template('dir/create.html', oR=oR)
+    if "edit-dir" in oR.oArgs:
+        return render_template('dir/edit.html', oR=oR)
     if "remove-dir" in oR.oArgs:
-        return render_template('dir_remove.html', oR=oR)
+        return render_template('dir/remove.html', oR=oR)
     if "clean-dirs" in oR.oArgs:
-        return render_template('dir_clean.html', oR=oR)
+        return render_template('dir/clean.html', oR=oR)
     if "copy-dir" in oR.oArgs:
         return ""
     if "accept-save-dir" in oR.oArgs:
@@ -55,12 +77,14 @@ def index():
         pass
 
     if "create-file" in oR.oArgs:
-        return render_template('file_create.html', oR=oR)
+        return render_template('file/create.html', oR=oR)
+    if "edit-file" in oR.oArgs:
+        return render_template('file/edit.html', oR=oR)
     if "remove-file" in oR.oArgs:
         oR.aFiles = oR.oArgsLists["files"]
-        return render_template('file_remove.html', oR=oR)
+        return render_template('file/remove.html', oR=oR)
     if "clean-files" in oR.oArgs:
-        return render_template('file_clean.html', oR=oR)
+        return render_template('file/clean.html', oR=oR)
     if "copy-file" in oR.oArgs:
         oR.aFiles = oR.oArgsLists["files"]
         return ""
@@ -74,10 +98,10 @@ def index():
         pass
 
     if "upload-files" in oR.oArgs:
-        return render_template('upload_files.html')
+        return render_template('uploads/upload_files.html')
     if "download-files" in oR.oArgs:
         oR.aFiles = oR.oArgsLists["files"]
-        return render_template('download_files.html', oR=oR)
+        return render_template('downloads/download_files.html', oR=oR)
 
         # return redirect(request.path+"?select-tab="+sSelected)
     
@@ -152,10 +176,17 @@ def index():
 
     return render_template('index.html', oR=oR)
 
+@app.route("/readme", methods=['GET', 'POST'])
+def readme():
+    oR = RequestVars()
+
+    fnPrepareArgs(oR)
+
+    return render_template('readme.html', oR=oR)
+
 @app.route("/getfile")
 def getfile():
     oR = RequestVars()
-    oR.sBaseURL = request.url
 
     fnPrepareArgs(oR)
 
@@ -164,27 +195,27 @@ def getfile():
     if oR.sDownload != '1':
         # NOTE: Превью PDF
         if re.search(r"djvu$", oR.sFullPath):
-            sFileName = os.path.basename(oR.sFullPath)+'.pdf'
+            sFileName = base64.b64encode(oR.sFullPath)+'.pdf'
             sTmpFile = '/tmp/'+sFileName
             print("[!] >> "+sTmpFile)
-            if not os.path.isfile(sTmpFile):
+            if not fnIsFile(sTmpFile):
                 sCMD = 'ddjvu -format=pdf -quality=85 "'+oR.sFullPath+'" "'+sTmpFile+'" '
                 os.system(sCMD)
             oR.sFullPath = sTmpFile
         # NOTE: Превью DOCX
         if re.search(r"docx$", oR.sFullPath):
-            sFileName = os.path.basename(oR.sFullPath)+'.pdf'
+            sFileName = base64.b64encode(oR.sFullPath)+'.pdf'
             sTmpFile = '/tmp/'+sFileName
             print("[!] >> "+sTmpFile)
-            if not os.path.isfile(sTmpFile):
+            if not fnIsFile(sTmpFile):
                 sCMD = 'unoconv -f pdf -o "'+sTmpFile+'" "'+oR.sFullPath+'"'
                 os.system(sCMD)
             oR.sFullPath = sTmpFile
 
-    if not os.path.isfile(oR.sFullPath):
+    if not fnIsFile(oR.sFullPath):
         return "<h1>Файл не найден</h1><p>"+oR.sFullPath+"</p>"
 
-    resp = Response(open(oR.sFullPath, 'rb').read())
+    resp = Response(fnReadFile(oR.sFullPath))
 
     if re.search(r"(pdf|docx)$", oR.sFullPath):    
         resp.headers['Content-Type'] = 'application/pdf'
@@ -194,7 +225,6 @@ def getfile():
 @app.route("/preview")
 def preview():
     oR = RequestVars()
-    oR.sBaseURL = request.url
 
     fnPrepareArgs(oR)
 
@@ -214,7 +244,7 @@ def preview():
     
     oR.sFullPath = os.path.join(oR.sFullPath, oR.sFile)
 
-    if not os.path.isfile(oR.sFullPath):
+    if not fnIsFile(oR.sFullPath):
         return "<h1>Файл не найден</h1><p>"+oR.sFullPath+"</p>" 
     
     # NOTE: Превью для изображений
@@ -223,7 +253,7 @@ def preview():
         print(oR.sFullPath)
         return render_template('preview_image.html', 
             sFullPath=oR.sFullPath,
-            sFullSizeBase64Code=base64.b64encode(open(oR.sFullPath,'rb').read()).decode('utf-8')
+            sFullSizeBase64Code=base64.b64encode(fnReadFile(oR.sFullPath)).decode('utf-8')
         )
 
     # NOTE: Превью для документов
@@ -233,68 +263,13 @@ def preview():
             sFullPath=urllib.parse.quote("/getfile?full-path="+oR.sFullPath)
         )
     
-    if is_binary_string(open(oR.sFullPath, 'rb').read(1024)):
+    if is_binary_string(fnReadFile(oR.sFullPath)):
         return "<h1>Бинарный файл</h1><p>"+oR.sFullPath+"</p>" 
     else:
-        sCode = open(oR.sFullPath).read()
+        sCode = fnReadFile(oR.sFullPath)
         return render_template('preview_textfile.html', 
             sCode=sCode
         )
-
-@app.route("/readme")
-def readme():
-    pass
-
-# @app.route("/tabs_add")
-# def tabs_add():
-#     sSelected = request.args.get('sSelected', '')
-
-#     if ("save" in request.args):
-#         get_db().execute(
-#             "INSERT INTO (title, path) VALUES (?, ?)", 
-#             (request.args['title'], 
-#             request.args['path'])
-#         )
-#         get_db().commit()
-#     else:
-#         return render_template('form_new_tab.html', 
-#             sSelected=sSelected
-#         )
-
-#     return redirect("/?sSelected="+sSelected)
-
-# @app.route("/tabs_remove")
-# def tabs_remove():
-#     sSelected = request.args.get('sSelected', '')
-
-#     if ("save" in request.args):
-#         get_db().execute("DELETE tabs WHERE id=?", (sSelected,))
-#         get_db().commit()
-#     else:
-#         return render_template('form_delete_tab.html', 
-#             sSelected=sSelected
-#         )
-
-#     return redirect("/?sSelected="+sSelected)
-
-# @app.route("/tabs_clean")
-# def tabs_clean():
-#     sSelected = request.args.get('sSelected', '')
-
-#     if ("save" in request.args):
-#         get_db().execute("DELETE tabs")
-#         get_db().commit()
-#     else:
-#         return render_template('form_clean_tab.html', 
-#             sSelected=sSelected
-#         )
-
-#     return redirect("/?sSelected="+sSelected)
-
-import sysrsync
-
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
 
 def fnShedulerJob():
     pass
@@ -305,64 +280,18 @@ sched.start()
 
 @app.route("/find")
 def find():
-
-    if ("action" in request.args):
-        if request.args["action"]=="find_add":
-            pass
-        if request.args["action"]=="find_edit":
-            pass
-        if request.args["action"]=="find_remove":
-            pass
     
     return render_template('find.html')
 
 @app.route("/mounts")
 def mounts():
     
-    if ("action" in request.args):
-        if request.args["action"]=="mounts_add":
-            pass
-        if request.args["action"]=="mounts_edit":
-            pass
-        if request.args["action"]=="mounts_remove":
-            pass
-    
     return render_template('mounts.html')
 
 @app.route("/rsync")
 def rsync():
-    
-    if ("action" in request.args):
-        if request.args["action"]=="rsync_add":
-            pass
 
-        if request.args["action"]=="rsync_edit":
-            pass
-
-        if request.args["action"]=="rsync_remove":
-            pass
-
-        if request.args["action"]=="rsync_option_add":
-            pass
-
-        if request.args["action"]=="rsync_option_edit":
-            pass
-
-        if request.args["action"]=="rsync_option_remove":
-            pass
-
-        if request.args["action"]=="rsync_process_add":
-            pass
-
-        if request.args["action"]=="rsync_process_edit":
-            pass
-
-        if request.args["action"]=="rsync_process_remove":
-            pass
-            # get_db().execute("DELETE tabs WHERE id=?", (sSelected,))
-            # get_db().commit()
-
-    return render_template('rsync_list.html')
+    return render_template('rsync.html')
 
 @app.route("/favorites", methods=['GET', 'POST'])
 def favorites():

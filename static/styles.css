@@ -23,14 +23,22 @@ body, html {
     height: 100%;
 }
 
-.tabs-list {
+.wrapper {
     position:absolute;
     top: 0px;
     left: 0px;
     right: 0px;
     bottom: 0px;
     display: grid;
-    grid-template-columns: 300px 1fr 1fr;
+    grid-template-columns: 30px 300px 1fr 1fr;
+}
+
+.app-modes {
+    
+}
+
+.app-modes > * {
+    width: 100%;
 }
 
 .left-panel {
@@ -146,7 +154,7 @@ body, html {
 }
 
 .files-grouped {
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
     display: grid;
     grid-template-columns: 100px 1fr;
 }
@@ -167,7 +175,7 @@ body, html {
 
 .files-grouped-files {
     overflow-y: scroll;
-    height: calc(50vh - 30px)
+    height: calc(50vh - 60px)
 }
 
 .file-size {

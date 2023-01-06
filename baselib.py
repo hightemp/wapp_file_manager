@@ -154,6 +154,9 @@ def to_camel_case(snake_str):
     return 's'+''.join(x.title() for x in components[0:])
 
 def fnPrepareArgs(oR):
+    oR.sBaseURL = request.url
+    oR.sPathURL = request.path
+
     oR.oArgs = parse_get(request.args)
     oR.oArgsLists = parse_multi_form(request.args)
 
@@ -204,3 +207,8 @@ def fnPrepareFormFields(aFields, oKls, sSelID):
                     aFields[sK]['value'] = ''
     return aFields
 
+def fnIsFile(sFullPath):
+    return os.path.isfile(os.path.expanduser(sFullPath))
+
+def fnReadFile(sFullPath):
+    return open(os.path.expanduser(sFullPath), 'rb').read()

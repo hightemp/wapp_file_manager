@@ -108,6 +108,8 @@ class RequestVars:
     oArgs = {}
     oArgsLists = {}
 
+    sBaseURL = ""
+
     sPreviewURL = ""
 
     sSelectFile = ''

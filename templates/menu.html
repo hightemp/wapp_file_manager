@@ -1,0 +1,8 @@
+<div class="app-modes">
+    <a href="/" class="btn {{ 'btn-primary' if oR.sPathURL|string=='/' }}" title="" ><i class="bi bi-house"></i></a>
+    <a href="/readme" class="btn {{ 'btn-primary' if oR.sPathURL|string=='/readme' }}" title="README" ><i class="bi bi-layout-text-window-reverse"></i></a>
+    <a href="/rsync" class="btn {{ 'btn-primary' if oR.sPathURL|string=='/rsync' }}" title="rsync"><i class="bi bi-arrow-left-right"></i></a>
+    <a href="/favorites" class="btn {{ 'btn-primary' if oR.sPathURL|string=='/favorites' }}" title="Избранное"><i class="bi bi-journal-bookmark"></i></a>
+    <a href="/find" class="btn {{ 'btn-primary' if oR.sPathURL|string=='/find' }}" title="Поиск"><i class="bi bi-search"></i></a>
+    <a href="/mounts" class="btn {{ 'btn-primary' if oR.sPathURL|string=='/mounts' }}" title="Маунты"><i class="bi bi-disc"></i></a>
+</div>

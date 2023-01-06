@@ -5,16 +5,12 @@
 
 {{ macros.form_hidden_fields(oR.oArgs) }}
 
-    <div class="tabs-list">
+    <div class="wrapper">
+        {% include "menu.html" %}
         <div class="left-panel">
             <div class="btn-group" style="width:100%">
-                <a href="/readme" class="btn btn-secondary" title="README" ><i class="bi bi-layout-text-window-reverse"></i></a>
                 {{ macros.btn("tabs-add", "bi-file-plus", "btn-success", "Добавить вкладку") }}
                 {{ macros.btn("tabs-remove", "bi-trash", "btn-danger", "Удалить вкладку") }}
-                <a href="/rsync" class="btn btn-info" title="rsync"><i class="bi bi-arrow-left-right"></i></a>
-                <a href="/favorites" class="btn btn-secondary" title="Избранное"><i class="bi bi-journal-bookmark"></i></a>
-                <a href="/find" class="btn btn-secondary" title="Поиск"><i class="bi bi-search"></i></a>
-                <a href="/mounts" class="btn btn-secondary" title="Маунты"><i class="bi bi-disc"></i></a>
             </div>
             <div class="list-group left-panel-list">
                 {% for oTab in oR.aTabs %}
