@@ -15,17 +15,17 @@
 # gcc -Os $($PY-config --includes) main.c -o wapp_file_manager $($PY-config --ldflags) -l$PYTHONLIBVER
 
 CFILE=wapp_file_manager
+PORT=5000
 
 if [ "$1" == "" ]; then
     pyinstaller -F --path "." --add-data "templates:templates" --add-data "static:static" --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
-    cp dist/__main__ ../$CFILE
-    cd ..
-    $CFILE  --bind 0.0.0.0:5021
+    cp dist/__main__ ../$CFILE.bin
+    ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10
 elif [ "$1" == "zipapp" ]; then
     # cp .env ..
     cd ..
     python3 -m zipapp $CFILE -p "/usr/bin/env python3"
     rm ./$CFILE.database.db
     echo $PWD/$CFILE.pyz
-    ./$CFILE.pyz --bind 0.0.0.0:5000 -w 10
+    ./$CFILE.pyz --bind 0.0.0.0:$PORT -w 10
 fi

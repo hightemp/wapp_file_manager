@@ -8,6 +8,7 @@ from database import *
 from flask import g, Flask, request
 import pkgutil
 import yaml
+import sys
 
 __DEBUG__ = False
 __PYINST__ = False
@@ -31,10 +32,13 @@ def sizeof_fmt(num, suffix="B"):
         num /= 1024.0
     return f"{num:.1f}Yi{suffix}"
 
+def fnIsPyInstaller():
+    return getattr(sys, 'frozen', False)
+
 def readfile(sFilePath):
     if (__DEBUG__):
         return open(sFilePath, 'rb').read()
-    elif (__PYINST__):
+    elif (__PYINST__ or fnIsPyInstaller()):
         print(sFilePath)
         return pkgutil.get_data('main', sFilePath )
     else:
