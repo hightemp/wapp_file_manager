@@ -17,15 +17,19 @@
 CFILE=wapp_file_manager
 PORT=5000
 
-if [ "$1" == "" ]; then
+if [ "$1" == "pyinst" ]; then
     pyinstaller -F --path "." --add-data "templates:templates" --add-data "static:static" --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
     cp dist/__main__ ../$CFILE.bin
-    ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10
+    if [ "$2" == "run" ]; then
+        ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10
+    fi
 elif [ "$1" == "zipapp" ]; then
     # cp .env ..
     cd ..
     python3 -m zipapp $CFILE -p "/usr/bin/env python3"
     rm ./$CFILE.database.db
     echo $PWD/$CFILE.pyz
-    ./$CFILE.pyz --bind 0.0.0.0:$PORT -w 10
+    if [ "$2" == "run" ]; then
+        ./$CFILE.pyz --bind 0.0.0.0:$PORT -w 10
+    fi
 fi

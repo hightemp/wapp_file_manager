@@ -31,7 +31,7 @@ python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
 # сборка пакета
 ./build.sh zipapp
 # сборка бинарника
-./build.sh
+./build.sh pyinst
 ```
 
 ## Релиз
