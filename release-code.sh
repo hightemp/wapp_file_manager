@@ -18,13 +18,19 @@ fi
 echo "[!] " gh release create $VERSION -t $VERSION -n '""' --target main
 gh release create $VERSION -t $VERSION -n "" --target main
 
-# CFILE=wapp_file_manager.pyz
+CFILE=wapp_file_manager
 
-cd ..
-python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
-echo $PWD/wapp_file_manager.pyz
-cd wapp_file_manager
-gh release upload $VERSION ../wapp_file_manager.pyz --clobber
+rm ../$CFILE.pyz
+./build.sh zipapp
+if [ -f ../$CFILE.pyz ]; then
+    gh release upload $VERSION ../$CFILE.pyz --clobber
+fi
+
+rm ../$CFILE.bin
+./build.sh
+if [ -f ../$CFILE.bin ]; then
+    gh release upload $VERSION ../$CFILE.bin --clobber
+fi
 
 # mv wapp_file_manager.pyz ./wapp_file_manager
 # cd wapp_file_manager
