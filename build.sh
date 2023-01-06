@@ -14,8 +14,18 @@
 # PYTHONLIBVER=python$($PY -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')$($PY-config --abiflags)
 # gcc -Os $($PY-config --includes) main.c -o wapp_file_manager $($PY-config --ldflags) -l$PYTHONLIBVER
 
-cd ..
-python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
-echo $PWD/wapp_file_manager.pyz
+CFILE=wapp_file_manager
 
-./wapp_file_manager.pyz -b 0.0.0.0:5000 -w 20
+if [ "$1" == "" ]; then
+    pyinstaller -F --path "." --add-data "templates:templates" --add-data "static:static" --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
+    cp dist/__main__ ../$CFILE
+    cd ..
+    $CFILE  --bind 0.0.0.0:5021
+elif [ "$1" == "zipapp" ]; then
+    # cp .env ..
+    cd ..
+    python3 -m zipapp $CFILE -p "/usr/bin/env python3"
+    rm ./$CFILE.database.db
+    echo $PWD/$CFILE.pyz
+    ./$CFILE.pyz --bind 0.0.0.0:5000 -w 10
+fi

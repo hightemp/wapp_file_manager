@@ -14,11 +14,6 @@ CREATE TABLE tabs_history (
     selected_file TEXT NULL
 );
 
-INSERT INTO tabs (title, path) VALUES ("test 1", "/home/hightemp");
-INSERT INTO tabs (title, path) VALUES ("test 2", "/");
-INSERT INTO tabs (title, path) VALUES ("test 3", "/home/hightemp/Pictures/");
-INSERT INTO tabs (title, path) VALUES ("test 4", "/home/hightemp/.config/");
-
 DROP TABLE IF EXISTS rsync_sync;
 CREATE TABLE rsync_sync (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

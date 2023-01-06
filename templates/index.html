@@ -1,140 +1,129 @@
+{% import "macros.html" as macros %}
 {% include "b_header.html" %}
+
+<form action="">
+
+{{ macros.form_hidden_fields(oR.oArgs) }}
 
     <div class="tabs-list">
         <div class="left-panel">
             <div class="btn-group" style="width:100%">
-                <a href="/readme?sSelected={{ sSelected }}" class="btn btn-secondary" title="README" ><i class="bi bi-layout-text-window-reverse"></i></a>
-                <a href="/tabs_add?sSelected={{ sSelected }}" class="btn btn-success" title="Создать" ><i class="bi bi-file-plus"></i></a>
-                <a href="/tabs_remove?sSelected={{ sSelected }}" class="btn btn-danger" title="Удалить"><i class="bi bi-trash"></i></a>
-                <a href="/tabs_clean?sSelected={{ sSelected }}" class="btn btn-danger" title="Очистить"><i class="bi bi-trash-fill"></i></a>
+                <a href="/readme" class="btn btn-secondary" title="README" ><i class="bi bi-layout-text-window-reverse"></i></a>
+                {{ macros.btn("tabs-add", "bi-file-plus", "btn-success", "Добавить вкладку") }}
+                {{ macros.btn("tabs-remove", "bi-trash", "btn-danger", "Удалить вкладку") }}
                 <a href="/rsync" class="btn btn-info" title="rsync"><i class="bi bi-arrow-left-right"></i></a>
                 <a href="/favorites" class="btn btn-secondary" title="Избранное"><i class="bi bi-journal-bookmark"></i></a>
                 <a href="/find" class="btn btn-secondary" title="Поиск"><i class="bi bi-search"></i></a>
                 <a href="/mounts" class="btn btn-secondary" title="Маунты"><i class="bi bi-disc"></i></a>
             </div>
             <div class="list-group left-panel-list">
-                {% for oTab in aTabs %}
+                {% for oTab in oR.aTabs %}
                     <div class="input-group tab-row">
                         <div class="input-group-text">
                             <input class="form-check-input mt-0" type="checkbox" value="" name="tabs[{{oTab[0]}}]" />
                         </div>
-                        <a 
-                            class="list-group-item list-group-item-action {{ 'active' if oTab[0]|string == sSelected }} " 
-                            href="?sSelected={{ oTab[0] }}"
-                            {{ 'disabled="disabled"' if not aExitstsTabs[loop.index] }}
+                        <button type="submit" 
+                            class="list-group-item list-group-item-action {{ 'active' if oTab[0]|string == sSelectTab }} " 
+                            name="select-tab" value="{{ oTab.id }}"
                         >
-                            {{ oTab[1] }}
+                            {{ oTab.title }}
                             <br>
-                            <small>{{ oTab[2] }}</small>
-                        </a>
+                            <small>{{ oTab.path }}</small>
+                            <small>{{ oTab.selected_file }}</small>
+                        </button>
                     </div>
                 {% endfor %}
             </div>
         </div>
         <div class="right-panel">
-            {% if sSelected %}
+            {% if oR.sSelectTab %}
             <div class="right-panel-block">
-                <form action="" method="get">
-                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
-                    <input type="hidden" id="sPath" name="sPath" value="{{sPath}}" />
-                    <input type="hidden" id="sDir" name="sDir" value="{{sDir}}" />
-                    <input type="hidden" id="sFile" name="sFile" value="{{sFile}}" />
-
-                    <div class="header"><b>Директории:</b> {{sPath}}</div>
+                    <div class="header"><b>Директории:</b> {{oR.sPath}}</div>
                     <div class="btn-group">
-                        <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-left"></i></a>
-                        <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-right"></i></a>
-                        <a href="?sSelected={{sSelected}}&sDir=.." class="btn btn-secondary" aria-current="page"><i class="bi bi-arrow-up"></i></a>
+                        {{ macros.btn("dir", "bi-arrow-left", "btn-secondary", "Назад", "..") }}
+                        {{ macros.btn("dir", "bi-arrow-right", "btn-secondary", "Вперед", "..") }}
+                        {{ macros.btn("dir", "bi-arrow-up", "btn-secondary", "Наверх", "..") }}
                         <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page"><i class="bi bi-arrow-repeat"></i></a>
-                        <button class="btn btn-success" type="submit" name="action" value="create_dir"><i class="bi bi-file-plus"></i></button>
-                        <button class="btn btn-secondary" type="submit" name="action" value="copy_dir"><i class="bi bi-files"></i></button>
-                        <button class="btn btn-danger" type="submit" name="action" value="remove_dir"><i class="bi bi-trash"></i></button>
-                        <button class="btn btn-danger" type="submit" name="action" value="clean_dirs"><i class="bi bi-trash-fill"></i></button>
+                        {{ macros.btn("create-dir", "bi-file-plus", "btn-success", "Создать директорию", "..") }}
+                        {{ macros.btn("copy-dir", "bi-file-plus", "btn-secondary", "Копировать директорию", "..") }}
+                        {{ macros.btn("remove-dir", "bi-file-plus", "btn-danger", "Удалить директорию", "..") }}
+                        {{ macros.btn("clean-dirs", "bi-file-plus", "btn-danger", "Очистить директорию", "..") }}
                     </div>
                     <div class="list-group right-panel-list dirs-list">
-                        {% if aDirs|length == 0 %}
+                        {% if oR.aDirs|length == 0 %}
                         <div class="nothing-found-row">Ничего не найдено..</div>
                         {% endif %}
-                        {% for sDir in aDirs %}
+                        {% for sItemDir in oR.aDirs %}
                             <div class="input-group dir-row">
                                 <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" value="{{sDir}}" name="dirs[]" />
+                                    <input class="form-check-input mt-0" type="checkbox" value="{{sItemDir}}" name="dirs[]" />
                                 </div>
                                 
-                                <a 
+                                <button type="submit"
                                     class="list-group-item list-group-item-action" 
-                                    href="?sSelected={{sSelected}}&sDir={{sDir}}"
+                                    name="dir" value="{{sItemDir}}"
                                 >
-                                    {% include 'folder-item.html' %}
-                                    {{ sDir }}
+                                    <i class="bi bi-folder"></i>
+                                    {{ sItemDir }}
                                 </a>
                             </div>
                         {% endfor %}
                     </div>
-                </form>
             </div>
             <div class="right-panel-block">
-                <form action="" method="get">
-                    <input type="hidden" id="sSelected" name="sSelected" value="{{sSelected}}" />
-                    <input type="hidden" id="sPath" name="sPath" value="{{sPath}}" />
-                    <input type="hidden" id="sDir" name="sDir" value="{{sDir}}" />
-                    <input type="hidden" id="sFile" name="sFile" value="{{sFile}}" />
-                    <input type="hidden" id="sFileExt" name="sFileExt" value="{{sFileExt}}" />
-
                     <div class="header"><b>Файлы</b></div>
                     <div class="btn-group">
                         <a href="{{sBaseURL}}" class="btn btn-primary" aria-current="page"><i class="bi bi-arrow-repeat"></i></a>
-                        <button class="btn btn-success" type="submit" name="action" value="create_file"><i class="bi bi-file-plus"></i></button>
-                        <button class="btn btn-secondary" type="submit" name="action" value="copy_file"><i class="bi bi-files"></i></button>
-                        <button class="btn btn-danger" type="submit" name="action" value="remove_file"><i class="bi bi-trash"></i></button>
-                        <button class="btn btn-danger" type="submit" name="action" value="clean_files"><i class="bi bi-trash-fill"></i></button>
-                        <button class="btn btn-secondary" type="submit" name="action" value="upload_files"><i class="bi bi-upload"></i></button>
-                        <button class="btn btn-secondary" type="submit" name="action" value="download_files"><i class="bi bi-download"></i></button>
+                        {{ macros.btn("create-file", "bi-file-plus", "btn-success", "Создать файл") }}
+                        {{ macros.btn("copy-file", "bi-files", "btn-secondary", "Копировать файл") }}
+                        {{ macros.btn("remove-file", "bi-trash", "btn-danger", "Удалить файл") }}
+                        {{ macros.btn("clean-file", "bi-file-plus", "btn-danger", "Очистить от файлов") }}
+                        {{ macros.btn("upload-files", "bi-upload", "btn-success", "Загрузить на сервер") }}
+                        {{ macros.btn("download-files", "bi-download", "btn-success", "Скачать с сервера") }}
                         <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks-grid"></i></a>
                         <a href="#" class="btn btn-secondary"><i class="bi bi-ui-checks"></i></a>
                     </div>
                     <div class="list-group right-panel-list files-list">
-                        {% if aFiles|length == 0 %}
+                        {% if oR.aFiles|length == 0 %}
                         <div class="nothing-found-row">Ничего не найдено..</div>
                         {% endif %}
                         <div class="files-grouped">
                             <div class="files-grouped-ext">
-                                {% for sExt in oGroupedFiles %}
+                                {% for sItemExt in oR.oGroupedFiles %}
                                 <div class="input-group ext-row">
-                                    <a 
-                                        class="list-group-item list-group-item-action {{ 'active' if sFileExt|string == sExt|string }}" 
-                                        href="?sSelected={{sSelected}}&sFileExt={{sExt}}"
+                                    <button 
+                                        type="submit" name="file-ext" value="{{sItemExt}}"
+                                        class="list-group-item list-group-item-action {{ 'active' if oR.sFileExt|string == sItemExt|string }}" 
                                     >
-                                        <div>{{ sExt }}</div>
-                                    </a>
+                                        <div>{{ sItemExt }}</div>
+                                    </button>
                                 </div>
                                 {% endfor %}
                             </div>
                             <div class="files-grouped-files">
-                                {% for sFile in aFiles %}
+                                {% for sItemFile in oR.aFiles %}
                                 <div class="input-group file-row">
                                     <div class="input-group-text">
-                                        <input class="form-check-input mt-0" type="checkbox" value="{{sFile}}" name="files[]" />
+                                        <input class="form-check-input mt-0" type="checkbox" value="{{sItemFile}}" name="files[]" />
                                     </div>
-                                    <a 
-                                        class="list-group-item list-group-item-action {{ 'active' if sFile == sCurFile }}" 
-                                        href="?sSelected={{sSelected}}&sFileExt={{sFileExt}}&sFile={{sFile}}"
+                                    <button
+                                        type="submit" name="file" value="{{sItemFile}}"
+                                        class="list-group-item list-group-item-action {{ 'active' if sItemFile == oR.sFile }}" 
                                     >
-                                        <div>{{ sFile }}</div>
-                                        <small class="file-size">{{ aFilesInfo[loop.index-1].human_size }}</small>
-                                        <small class="file-full-path">{{ sPath }}/{{ sFile }}</small>
-                                    </a>
+                                        <div>{{ sItemFile }}</div>
+                                        <small class="file-size">{{ oR.aFilesInfo[loop.index-1].human_size }}</small>
+                                        <small class="file-full-path">{{ oR.sPath }}/{{ sItemFile }}</small>
+                                    </button>
                                 </div>
                                 {% endfor %}    
                             </div>
                         </div>
                     </div>
-                </form>
             </div>
             {% endif %}
         </div>
         <div class="preview-panel">
-            <iframe name="preview" src="{{sPreviewURL}}" frameborder="0"></iframe>
+            <iframe name="preview" src="{{oR.sPreviewURL}}" frameborder="0"></iframe>
         </div>
     </div>
 
@@ -144,4 +133,7 @@
             $(".files-grouped-files").scrollTo($(".files-grouped-files .list-group-item.active"))
         })
     </script>
+
+</form>
+
 {% include "b_footer.html" %}

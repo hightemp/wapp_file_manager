@@ -27,6 +27,8 @@ python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
 
 ## Зависимости
 
-- apt пакеты
-    - djvulibre-bin
-    - unoconv
+apt пакеты
+
+```
+sudo apt install djvulibre-bin unoconv
+```

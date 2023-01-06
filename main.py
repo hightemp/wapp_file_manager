@@ -1,83 +1,30 @@
 from flask import g, Flask, request, send_file, redirect, session, jsonify
+from flask import session, url_for
+from flask import Response
+
 import os
 import re
-import sqlite3
 import re
 import base64
 import urllib.parse
 
-from flask import Response
 import importlib.resources
 import jinja2
 from jinja2 import Template, FunctionLoader, Environment, BaseLoader
 from flask import Flask
 import mimetypes
 
-# importlib.resources.read_text(__package__, "data.txt")
+from os import listdir
+from os.path import isdir, isfile, join
+
+from request_vars import *
+from database import *
+from baselib import *
+import pydotenv
 
 app = Flask(__name__)
 
-DATABASE = './database.db'
-
-import zipfile
-
-def readfile(sFilePath):
-    with zipfile.ZipFile(os.path.dirname(__file__)) as z:
-        # print(z.namelist())
-        with z.open(sFilePath) as f:
-            print("[!] "+f.name)
-            # print("[!] "+f.read().decode("utf-8"))
-            return f.read()
-    return "ERROR"
-
-# def readfile(sFilePath, sBasePath=__package__):
-#     return importlib.resources.read_text(sBasePath, sFilePath)
-
-def load_template(name):
-    return readfile("templates/"+name).decode("utf-8")
-
-oTempFunctionLoader = FunctionLoader(load_template)
-
-def render_template(name, **kwargs):
-    data = load_template(name)
-    tpl = Environment(loader=oTempFunctionLoader).from_string(data)
-    return tpl.render(**kwargs)
-
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-
-def init_db():
-    with app.app_context():
-        db = get_db()
-        # with app.open_resource('schema.sql', mode='r') as f:
-        sSQL = readfile("schema.sql").decode("utf-8")
-        db.cursor().executescript(sSQL)
-        db.cursor().executescript(sSQL)
-        db.commit()
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if rv else None) if one else rv
-
-def sizeof_fmt(num, suffix="B"):
-    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
-        if abs(num) < 1024.0:
-            return f"{num:3.1f}{unit}{suffix}"
-        num /= 1024.0
-    return f"{num:.1f}Yi{suffix}"
-
-@app.route("/static_dyn/<path:path>", methods=['GET', 'POST'])
+@app.route("/zip/static/<path:path>", methods=['GET', 'POST'])
 def static_dyn(path):
     oR = Response(readfile("static/"+path), mimetype=mimetypes.guess_type(path)[0])
     oR.headers['Cache-Control'] = 'max-age=60480000, stale-if-error=8640000, must-revalidate'
@@ -85,303 +32,264 @@ def static_dyn(path):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    if not os.path.isfile(DATABASE):
-        # if (request.args.get('init_db', '')=='1'):
-        print("=========================================================")
-        print("INIT DB")
-        init_db()
-        print("=========================================================")
-        return redirect("/")
+    oR = RequestVars()
+    oR.sBaseURL = request.url
 
-    sBaseURL = request.url
+    fnPrepareArgs(oR)
 
-    from os import listdir
-    from os.path import isdir, isfile, join
+    if "create-dir" in oR.oArgs:
+        return render_template('dir_create.html', oR=oR)
+    if "remove-dir" in oR.oArgs:
+        return render_template('dir_remove.html', oR=oR)
+    if "clean-dirs" in oR.oArgs:
+        return render_template('dir_clean.html', oR=oR)
+    if "copy-dir" in oR.oArgs:
+        return ""
+    if "accept-save-dir" in oR.oArgs:
+        os.mkdir(oR.oArgs["name"])
+    if "accept-remove-dir" in oR.oArgs:
+        oR.aDirs = oR.oArgsLists["dirs"]
+        for sDir in oR.aDirs:
+            os.rmdir(os.path.join(oR.sPath, sDir))
+    if "accept-clean-dirs" in oR.oArgs:
+        pass
 
-    sSelected = request.args.get('sSelected', '')
-    sPath = request.args.get('sPath', '')
-    sDir = request.args.get('sDir', '')
-    sFile = request.args.get('sFile', '')
-    sFileExt = request.args.get('sFileExt', 'Все')
+    if "create-file" in oR.oArgs:
+        return render_template('file_create.html', oR=oR)
+    if "remove-file" in oR.oArgs:
+        oR.aFiles = oR.oArgsLists["files"]
+        return render_template('file_remove.html', oR=oR)
+    if "clean-files" in oR.oArgs:
+        return render_template('file_clean.html', oR=oR)
+    if "copy-file" in oR.oArgs:
+        oR.aFiles = oR.oArgsLists["files"]
+        return ""
+    if "accept-save-file" in oR.oArgs:
+        pass
+    if "accept-remove-file" in oR.oArgs:
+        oR.aFiles = oR.oArgsLists["files"]
+        for sFile in oR.aFiles:
+            os.unlink(os.path.join(oR.sPath, sFile))
+    if "accept-clean-files" in oR.oArgs:
+        pass
 
-    print("[>]", request.args)
-    if ("action" in request.args):
-        if request.args["action"]=="create_dir":
-            return render_template('dir_create.html', 
-                sSelected=sSelected
-            )
-        if request.args["action"]=="remove_dir":
-            return render_template('dir_remove.html', 
-                sSelected=sSelected
-            )
-        if request.args["action"]=="clean_dirs":
-            return render_template('dir_clean.html', 
-                sSelected=sSelected
-            )
-        if request.args["action"]=="copy_dir":
-            return ""
-        if request.args["action"]=="accept_save_dir":
-            os.mkdir(request.args["name"])
-        if request.args["action"]=="accept_remove_dir":
-            aDirs = request.args.getlist("dirs[]")
-            for sDir in aDirs:
-                os.rmdir(os.path.join(sPath, sDir))
-        if request.args["action"]=="accept_clean_dirs":
-            pass
+    if "upload-files" in oR.oArgs:
+        return render_template('upload_files.html')
+    if "download-files" in oR.oArgs:
+        oR.aFiles = oR.oArgsLists["files"]
+        return render_template('download_files.html', oR=oR)
 
-        if request.args["action"]=="create_file":
-            return render_template('file_create.html', 
-                sSelected=sSelected
-            )
-        if request.args["action"]=="remove_file":
-            aFiles = request.args.getlist("files[]")
-            return render_template('file_remove.html', 
-                aFiles=aFiles,
-                sSelected=sSelected,
-                sPath=sPath,
-                sDir=sDir,
-                sFile=sFile                
-            )
-        if request.args["action"]=="clean_files":
-            return render_template('file_clean.html', 
-                sSelected=sSelected
-            )
-        if request.args["action"]=="copy_file":
-            aFiles = request.args.getlist("files[]")
-            return ""
-        if request.args["action"]=="accept_save_file":
-            pass
-        if request.args["action"]=="accept_remove_file":
-            aFiles = request.args.getlist("files[]")
-            for sFile in aFiles:
-                print(os.path.join(sPath, sFile))
-                os.unlink(os.path.join(sPath, sFile))
-        if request.args["action"]=="accept_clean_files":
-            pass
-
-        if request.args["action"]=="upload_files":
-            return render_template('upload_files.html')
-        if request.args["action"]=="download_files":
-            aFiles = request.args.getlist("files[]")
-            return render_template('download_files.html',
-                aFiles=aFiles,
-                sSelected=sSelected,
-                sPath=sPath,
-                sDir=sDir,
-                sFile=sFile
-            )
-
-        return redirect(request.path+"?sSelected="+sSelected)
+        # return redirect(request.path+"?select-tab="+sSelected)
     
-    sPreviewURL="about:blank"
+    oR.sPreviewURL="about:blank"
 
-    if sFile != '':
-        sPreviewURL = "preview?sSelected="+sSelected+"&sFile="+sFile
-        print('[!] FILE SAVED:'+sFile)
-        get_db().execute("UPDATE tabs SET selected_file=? WHERE id=?", (sFile, sSelected))
-        get_db().commit()
+    if oR.sFile != '':
+        oR.sPreviewURL = "preview?select-tab="+oR.sSelectTab+"&file="+oR.sFile
+        Tab.update({"selected_file":oR.sSelectFile}).where(Tab.id==oR.sSelectTab)
     else:
-        aCurTab = query_db('SELECT * FROM tabs WHERE id=? LIMIT 1', (sSelected,))
-        if len(aCurTab)>0 and len(aCurTab[0])>3:
-            sFile = aCurTab[0][3]
-            if sFile:
-                sPreviewURL = "preview?sSelected="+sSelected+"&sFile="+sFile
+        oTab = None
+        try:
+            oTab = Tab.select().where(Tab.id==oR.sSelectTab).get()
+        except:
+            oTab = None
+        if oTab:
+            oR.sPreviewURL = "preview?select-tab="+oR.sSelectTab+"&file="+oTab.selected_file
 
-    aFiles = []
-    aDirs = []
-    aFilesInfo = []
-    oGroupedFiles = dict()
-
-    if sPath != '':
-        print('[!] SAVED:'+sPath)
-        get_db().execute("UPDATE tabs SET path=? WHERE id=?", (sPath, sSelected))
-        get_db().commit()
+    if oR.sSelectPath != '':
+        print('[!] SAVED:'+oR.sSelectPath)
+        Tab.update({"path":oR.sSelectPath}).where(Tab.id==oR.sSelectTab)
     
-    aTabs = query_db('SELECT * FROM tabs')
-    aExitstsTabs = [os.path.isdir(f[2]) for f in aTabs]
-    # print(aTabs)
+    oR.aTabs = Tab.select()
+    oR.aExitstsTabs = [os.path.exists(f.path) for f in oR.aTabs]
 
-    aCurTab = query_db('SELECT * FROM tabs WHERE id=? LIMIT 1', (sSelected,))
-    if len(aCurTab)>0 and len(aCurTab[0])>1:
-        sPath = aCurTab[0][2]
+    oR.oCurTab = None
+    try:
+        oR.oCurTab = Tab.select().where(Tab.id==oR.sSelectTab).get()
+    except:
+        oR.oCurTab = None
+    if oR.oCurTab:
+        oR.sPath = oR.oCurTab.path
 
-    print("[!] PATH 1:"+sPath+", "+sDir)
-    if sDir:
-        sPath = os.path.realpath(os.path.join(sPath, sDir))
-        print("[!] PATH 2:"+sPath+", "+sDir)
-        get_db().execute("UPDATE tabs SET path=? WHERE id=?", (sPath, sSelected))
-        get_db().commit()
-        return redirect(request.path+"?sSelected="+sSelected)
-    print("[!] PATH 2:"+sPath+", "+sDir)
+    print(request.url)
+    print("[!] PATH 1:"+oR.sPath+", "+oR.sDir)
+    if oR.sDir:
+        oR.sPath = os.path.realpath(os.path.join(oR.sPath, oR.sDir))
+        print("[!] PATH 2:"+oR.sPath+", "+oR.sDir)
+        Tab.update({"path":oR.sPath}).where(Tab.id==oR.sSelectTab).execute()
+        del oR.oArgs["dir"]
+        return redirect(url_for('.index', **oR.oArgs))
+    print("[!] PATH 2:"+oR.sPath+", "+oR.sDir)
 
     try:
-        if sPath!='' and os.path.isdir(sPath):
-            aFiles = sorted([f for f in listdir(sPath) if isfile(join(sPath, f))])
-            aDirs = sorted([f for f in listdir(sPath) if isdir(join(sPath, f))])
+        if oR.sPath!='' and os.path.isdir(oR.sPath):
+            oR.aFiles = sorted([f for f in listdir(oR.sPath) if isfile(join(oR.sPath, f))])
+            oR.aDirs = sorted([f for f in listdir(oR.sPath) if isdir(join(oR.sPath, f))])
 
             # NOTE: Группировка файлов по расширениям
-            oGroupedFiles['Все'] = aFiles
-            for sFileN in aFiles:
+            oR.oGroupedFiles['Все'] = oR.aFiles
+            for sFileN in oR.aFiles:
                 aExt = sFileN.split('.')
                 sExt = '.'
                 if aExt[0] != '':
                     sExt = aExt.pop()
-                if not oGroupedFiles.get(sExt, ''):
-                    oGroupedFiles[sExt] = []
-                oGroupedFiles[sExt].append(sFileN)
+                if not oR.oGroupedFiles.get(sExt, ''):
+                    oR.oGroupedFiles[sExt] = []
+                oR.oGroupedFiles[sExt].append(sFileN)
 
-            aFiles = oGroupedFiles[sFileExt]
-            aFilesInfoTemp = [os.stat(os.path.join(sPath, f)) for f in aFiles]
-            aFilesInfo = []
+            if oR.sFileExt == '':
+                oR.sFileExt = 'Все'
+            if not oR.sFileExt in oR.oGroupedFiles:
+                oR.sFileExt = 'Все'
+            oR.aFiles = oR.oGroupedFiles[oR.sFileExt]
+            oR.aFilesInfoTemp = [os.stat(os.path.join(oR.sPath, f)) for f in oR.aFiles]
+            oR.aFilesInfo = []
 
-            for iI, oI in enumerate(aFilesInfoTemp):
-                aFilesInfo.append({'human_size': sizeof_fmt(oI.st_size)})
+            for iI, oI in enumerate(oR.aFilesInfoTemp):
+                oR.aFilesInfo.append({'human_size': sizeof_fmt(oI.st_size)})
     except RuntimeError as e:
         print("[E] ERROR:"+e)
         pass
 
-    return render_template('index.html', 
-        sSelected=sSelected, 
-        aTabs=aTabs, 
-        sFileExt=sFileExt,
-        aExitstsTabs=aExitstsTabs,
-        sPath=sPath,
-        aDirs=aDirs, 
-        aFiles=aFiles,
-        aFilesInfo=aFilesInfo,
-        oGroupedFiles=oGroupedFiles,
-        sCurDir=sDir,
-        sCurFile=sFile,
-        sPreviewURL=sPreviewURL,
-        sBaseURL=sBaseURL
-    )
-
-textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
-is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
+    return render_template('index.html', oR=oR)
 
 @app.route("/getfile")
 def getfile():
-    bDownload = request.args.get('bDownload', '')
-    sFullPath = request.args.get('sFullPath', '')
-    print("[!] >> "+sFullPath)
+    oR = RequestVars()
+    oR.sBaseURL = request.url
 
-    if bDownload != '1':
-        if re.search(r"djvu$", sFullPath):
-            sFileName = os.path.basename(sFullPath)+'.pdf'
+    fnPrepareArgs(oR)
+
+    print("[!] >> "+oR.sFullPath)
+
+    if oR.sDownload != '1':
+        # NOTE: Превью PDF
+        if re.search(r"djvu$", oR.sFullPath):
+            sFileName = os.path.basename(oR.sFullPath)+'.pdf'
             sTmpFile = '/tmp/'+sFileName
             print("[!] >> "+sTmpFile)
             if not os.path.isfile(sTmpFile):
-                sCMD = 'ddjvu -format=pdf -quality=85 "'+sFullPath+'" "'+sTmpFile+'" '
+                sCMD = 'ddjvu -format=pdf -quality=85 "'+oR.sFullPath+'" "'+sTmpFile+'" '
                 os.system(sCMD)
-            sFullPath = sTmpFile
-
-        if re.search(r"docx$", sFullPath):
-            sFileName = os.path.basename(sFullPath)+'.pdf'
+            oR.sFullPath = sTmpFile
+        # NOTE: Превью DOCX
+        if re.search(r"docx$", oR.sFullPath):
+            sFileName = os.path.basename(oR.sFullPath)+'.pdf'
             sTmpFile = '/tmp/'+sFileName
             print("[!] >> "+sTmpFile)
             if not os.path.isfile(sTmpFile):
-                sCMD = 'unoconv -f pdf -o "'+sTmpFile+'" "'+sFullPath+'"'
+                sCMD = 'unoconv -f pdf -o "'+sTmpFile+'" "'+oR.sFullPath+'"'
                 os.system(sCMD)
-            sFullPath = sTmpFile
+            oR.sFullPath = sTmpFile
 
-    if not os.path.isfile(sFullPath):
-        return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>"
+    if not os.path.isfile(oR.sFullPath):
+        return "<h1>Файл не найден</h1><p>"+oR.sFullPath+"</p>"
 
-    resp = Response(open(sFullPath, 'rb').read())
+    resp = Response(open(oR.sFullPath, 'rb').read())
 
-    if re.search(r"(pdf|docx)$", sFullPath):    
+    if re.search(r"(pdf|docx)$", oR.sFullPath):    
         resp.headers['Content-Type'] = 'application/pdf'
     
     return resp
 
 @app.route("/preview")
 def preview():
-    sSelected = request.args.get('sSelected', '')
-    sFile = request.args.get('sFile', '')
+    oR = RequestVars()
+    oR.sBaseURL = request.url
 
-    aCurTab = query_db('SELECT * FROM tabs WHERE id=? LIMIT 1', (sSelected,))
-    if len(aCurTab)>0 and len(aCurTab[0])>1:
-        sFullPath = aCurTab[0][2]
+    fnPrepareArgs(oR)
 
-    sFullPath = os.path.join(sFullPath, sFile)
+    # sSelected = request.args.get('sSelected', '')
+    # sFile = request.args.get('sFile', '')
 
-    if not os.path.isfile(sFullPath):
-        return "<h1>Файл не найден</h1><p>"+sFullPath+"</p>" 
+    oR.oCurTab = None
+    try:
+        oR.oCurTab = Tab.select().where(Tab.id==oR.sSelectTab).get()
+    except:
+        oR.oCurTab = None
+    if oR.oCurTab:
+        oR.sFullPath = oR.oCurTab.path
+
+    if oR.sFile == "":
+        return "" 
     
+    oR.sFullPath = os.path.join(oR.sFullPath, oR.sFile)
+
+    if not os.path.isfile(oR.sFullPath):
+        return "<h1>Файл не найден</h1><p>"+oR.sFullPath+"</p>" 
+    
+    # NOTE: Превью для изображений
     oRegImgExt = re.compile(r"(APNG|AVIF|GIF|JPG|JPEG|PNG|SVG|BMP|ICO|TIFF)$", re.IGNORECASE)
-    
-    if (oRegImgExt.search(sFile)):
-        print(sFullPath)
+    if (oRegImgExt.search(oR.sFile)):
+        print(oR.sFullPath)
         return render_template('preview_image.html', 
-            sFullPath=sFullPath,
-            sFullSizeBase64Code=base64.b64encode(open(sFullPath,'rb').read()).decode('utf-8')
+            sFullPath=oR.sFullPath,
+            sFullSizeBase64Code=base64.b64encode(open(oR.sFullPath,'rb').read()).decode('utf-8')
         )
 
+    # NOTE: Превью для документов
     oRegPDFExt = re.compile(r"(PDF|DJVU|DOCX)$", re.IGNORECASE)
-    
-    if (oRegPDFExt.search(sFile)):
+    if (oRegPDFExt.search(oR.sFile)):
         return render_template('preview_pdf.html', 
-            sFullPath="/getfile?sFullPath="+urllib.parse.quote(sFullPath)
+            sFullPath=urllib.parse.quote("/getfile?full-path="+oR.sFullPath)
         )
     
-    if is_binary_string(open(sFullPath, 'rb').read(1024)):
-        return "<h1>Бинарный файл</h1><p>"+sFullPath+"</p>" 
+    if is_binary_string(open(oR.sFullPath, 'rb').read(1024)):
+        return "<h1>Бинарный файл</h1><p>"+oR.sFullPath+"</p>" 
     else:
-        sCode = open(sFullPath).read()
+        sCode = open(oR.sFullPath).read()
         return render_template('preview_textfile.html', 
             sCode=sCode
         )
 
 @app.route("/readme")
 def readme():
-    sSelected = request.args.get('sSelected', '')
-    # return redirect("/?sSelected="+sSelected)
+    pass
 
-@app.route("/tabs_add")
-def tabs_add():
-    sSelected = request.args.get('sSelected', '')
+# @app.route("/tabs_add")
+# def tabs_add():
+#     sSelected = request.args.get('sSelected', '')
 
-    if ("save" in request.args):
-        get_db().execute(
-            "INSERT INTO (title, path) VALUES (?, ?)", 
-            (request.args['title'], 
-            request.args['path'])
-        )
-        get_db().commit()
-    else:
-        return render_template('form_new_tab.html', 
-            sSelected=sSelected
-        )
+#     if ("save" in request.args):
+#         get_db().execute(
+#             "INSERT INTO (title, path) VALUES (?, ?)", 
+#             (request.args['title'], 
+#             request.args['path'])
+#         )
+#         get_db().commit()
+#     else:
+#         return render_template('form_new_tab.html', 
+#             sSelected=sSelected
+#         )
 
-    return redirect("/?sSelected="+sSelected)
+#     return redirect("/?sSelected="+sSelected)
 
-@app.route("/tabs_remove")
-def tabs_remove():
-    sSelected = request.args.get('sSelected', '')
+# @app.route("/tabs_remove")
+# def tabs_remove():
+#     sSelected = request.args.get('sSelected', '')
 
-    if ("save" in request.args):
-        get_db().execute("DELETE tabs WHERE id=?", (sSelected,))
-        get_db().commit()
-    else:
-        return render_template('form_delete_tab.html', 
-            sSelected=sSelected
-        )
+#     if ("save" in request.args):
+#         get_db().execute("DELETE tabs WHERE id=?", (sSelected,))
+#         get_db().commit()
+#     else:
+#         return render_template('form_delete_tab.html', 
+#             sSelected=sSelected
+#         )
 
-    return redirect("/?sSelected="+sSelected)
+#     return redirect("/?sSelected="+sSelected)
 
-@app.route("/tabs_clean")
-def tabs_clean():
-    sSelected = request.args.get('sSelected', '')
+# @app.route("/tabs_clean")
+# def tabs_clean():
+#     sSelected = request.args.get('sSelected', '')
 
-    if ("save" in request.args):
-        get_db().execute("DELETE tabs")
-        get_db().commit()
-    else:
-        return render_template('form_clean_tab.html', 
-            sSelected=sSelected
-        )
+#     if ("save" in request.args):
+#         get_db().execute("DELETE tabs")
+#         get_db().commit()
+#     else:
+#         return render_template('form_clean_tab.html', 
+#             sSelected=sSelected
+#         )
 
-    return redirect("/?sSelected="+sSelected)
+#     return redirect("/?sSelected="+sSelected)
 
 import sysrsync
 
