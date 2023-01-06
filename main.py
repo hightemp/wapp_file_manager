@@ -297,8 +297,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 def fnShedulerJob():
-    """ Function for test purposes. """
-    print("Scheduler is alive!")
+    pass
 
 sched = BackgroundScheduler(daemon=True)
 sched.add_job(fnShedulerJob, IntervalTrigger(), minutes=1)
