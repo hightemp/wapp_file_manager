@@ -1,5 +1,6 @@
 Flask==2.0.1
 Jinja2==3.0.1
+peewee==3.15.4
 pydotenv==0.0.7
 PyYAML==5.4.1
 filetype==1.2.0 
