@@ -19,6 +19,7 @@ PORT=5000
 
 PYINSTALLER=pyinstaller
 PYINSTALLER_DOCKER="docker run -v $PWD:/src fydeinc/pyinstaller "
+PYINSTALLER_DOCKER="docker run -v $PWD:/src/ cdrx/pyinstaller-linux:python3"
 
 if [ "$1" == "pyinst" ]; then
     $PYINSTALLER -F --path "." --add-data 'templates:templates' --add-data 'static:static' --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
@@ -27,7 +28,7 @@ if [ "$1" == "pyinst" ]; then
         ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10
     fi
 elif [ "$1" == "pyinst_docker" ]; then
-    $PYINSTALLER_DOCKER -F --path "." --add-data='templates':'templates' --add-data='static':'static' --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
+    $PYINSTALLER_DOCKER "pyinstaller -F --path . --add-data='templates':'templates' --add-data='static':'static' --hidden-import 'main' --hidden-import 'baselib' --hidden-import 'database' --hidden-import 'request_vars' __main__.py"
     cp dist/__main__ ../$CFILE.bin
     if [ "$2" == "run" ]; then
         ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10

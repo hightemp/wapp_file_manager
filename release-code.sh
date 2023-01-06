@@ -27,7 +27,7 @@ CFILE=wapp_file_manager
 # fi
 
 rm ../$CFILE.bin
-./build.sh
+./build.sh pyinst_docker
 if [ -f ../$CFILE.bin ]; then
     gh release upload $VERSION ../$CFILE.bin --clobber
 fi
