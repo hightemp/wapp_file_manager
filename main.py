@@ -294,13 +294,14 @@ def readme():
 import sysrsync
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 
-def sensor():
+def fnShedulerJob():
     """ Function for test purposes. """
     print("Scheduler is alive!")
 
 sched = BackgroundScheduler(daemon=True)
-sched.add_job(sensor,'interval',minutes=1)
+sched.add_job(fnShedulerJob, IntervalTrigger(), minutes=1)
 sched.start()
 
 @app.route("/find")
