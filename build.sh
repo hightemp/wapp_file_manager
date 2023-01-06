@@ -17,8 +17,17 @@
 CFILE=wapp_file_manager
 PORT=5000
 
+PYINSTALLER=pyinstaller
+PYINSTALLER_DOCKER="docker run -v $PWD:/src fydeinc/pyinstaller "
+
 if [ "$1" == "pyinst" ]; then
-    pyinstaller -F --path "." --add-data "templates:templates" --add-data "static:static" --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
+    $PYINSTALLER -F --path "." --add-data 'templates:templates' --add-data 'static:static' --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
+    cp dist/__main__ ../$CFILE.bin
+    if [ "$2" == "run" ]; then
+        ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10
+    fi
+elif [ "$1" == "pyinst_docker" ]; then
+    $PYINSTALLER_DOCKER -F --path "." --add-data='templates':'templates' --add-data='static':'static' --hidden-import "main" --hidden-import "baselib" --hidden-import "database" --hidden-import "request_vars" __main__.py
     cp dist/__main__ ../$CFILE.bin
     if [ "$2" == "run" ]; then
         ../$CFILE.bin  --bind 0.0.0.0:$PORT -w 10

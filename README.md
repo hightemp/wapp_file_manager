@@ -27,6 +27,8 @@ python3 -m zipapp wapp_file_manager -p "/usr/bin/env python3"
 
 ## Сборка
 
+Для сборки используется образ **Manylinux/Windows Pyinstaller Docker Image** https://hub.docker.com/r/fydeinc/pyinstaller
+
 ```bash
 # сборка пакета
 ./build.sh zipapp

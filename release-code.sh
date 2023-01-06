@@ -20,11 +20,11 @@ gh release create $VERSION -t $VERSION -n "" --target main
 
 CFILE=wapp_file_manager
 
-rm ../$CFILE.pyz
-./build.sh zipapp
-if [ -f ../$CFILE.pyz ]; then
-    gh release upload $VERSION ../$CFILE.pyz --clobber
-fi
+# rm ../$CFILE.pyz
+# ./build.sh zipapp
+# if [ -f ../$CFILE.pyz ]; then
+#     gh release upload $VERSION ../$CFILE.pyz --clobber
+# fi
 
 rm ../$CFILE.bin
 ./build.sh
