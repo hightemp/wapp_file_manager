@@ -7,3 +7,4 @@ main.build
 main.bin
 main.dist
 main.onefile-build
+wapp_file_manager.database.db
