@@ -1,5 +1,7 @@
 # wapp_file_manager
 
+![](https://asdertasd.site/counter/wapp_file_manager)
+
 Файловый менеджер на flask. 
 
 - Есть просмотр изображений
